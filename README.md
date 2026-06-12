@@ -1,125 +1,77 @@
 # Claw Project
 
-We are creating a platform for running OpenClaw agents at scale. Issues for all related repositories will go here, unless they are very strictly related to _only_ that repository. If they lend toward the platform as a whole, issues belong here. This is where we track everything. We do not put code in this repository. This repository is for Issues and Documentation. 
+A platform for running OpenClaw AI assistants at scale on OpenShift.
+This repo is the central hub for issues, documentation, and
+cross-project coordination. No code lives here — open issues at
+[github.com/redhat-et/claw-project/issues](https://github.com/redhat-et/claw-project/issues).
 
-## The repos — clone these locally
+## What we're building
 
-Clone these so your local AI can read them and guide you, and so you can fix and contribute:
+A set of workflows for deploying and managing OpenClaw instances for
+different kinds of users. A cluster admin deploys multiple instances
+using preconfigured templates from claw-collections via a GitOps
+approach, controlling how much freedom each user gets — from a
+completely locked-down kiosk to full self-service.
 
-| Repo | Clone | What it is |
-|---|---|---|
-| **openclaw** | [https://github.com/openclaw/openclaw](https://github.com/openclaw/openclaw) | The OpenClaw agent itself — config, skills, plugins, the Control UI. |
-| **claw-operator** | [https://github.com/redhat-et/claw-operator](https://github.com/redhat-et/claw-operator) | The OpenShift operator that runs Claws — defines the `Claw` CR and seeds collections. |
-| **claw-operator-dashboard** | [https://github.com/redhat-et/claw-operator-dashboard](https://github.com/redhat-et/claw-operator-dashboard) | The deployer, which is a thin client for the operator. Also an admin dashboard. |
-| **claw-collections** | [https://github.com/redhat-et/claw-collections](https://github.com/redhat-et/claw-collections) | Reusable workspace bundles ("collections") and examples like `software-qa-mcp`. |
-| **claw-project** | [https://github.com/redhat-et/claw-project](https://github.com/redhat-et/claw-project) | This hub. **Found a bug or have a request? Open an issue here:** https://github.com/redhat-et/claw-project/issues |
+## User personas
 
-# Using the OpenClaw Deployer
+| Persona           | What they do                                                                   | Where to start                                                                |
+| ----------------- | ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
+| **Cluster Admin** | Deploys instances via GitOps, sets security policies, manages credentials      | [Enterprise Onboarding Workflows](docs/enterprise-onboarding-workflows.md)    |
+| **Power User**    | Self-manages their OpenClaw with full control over persona, skills, and models | [Deployer Guide](docs/deployer-guide.md)                                      |
+| **Business User** | Uses a curated assistant (HR, Sales, etc.) preconfigured by admin              | [Enterprise Onboarding](docs/enterprise-onboarding-workflows.md) (Scenario B) |
+| **Developer**     | Codes with OpenClaw, customizes workspace, creates collections                 | [Collections Guide](docs/collections-guide.md)                                |
 
-The **Deployer** is the OpenShift web app where you create or delete your OpenClaws.
-Open its route URL, sign in with GitHub, and
-it operates as *you* — you will only see your projects. Your namespace defaults to
-`<your-login>-claw`. The deployer is designed to get you up and running fast. Once running, you can
-interact with your OpenClaw to configure everything else.
-It's a thin client around the Claw API, see the **claw-operator** to learn more.
-Feel free to use the `Claw` Custom Resource directly instead of or after deploying with this deployer. 
+## The management spectrum
 
-You can view your Claw CRs with:
+The `spec.config.management` field on every Claw CR controls how
+much freedom the user has:
 
-```
-oc get claws -A
-```
-
-> [!NOTE]
-> The Deployer defaults to setting `spec.config.management: user` .
-> This gives direct access to your OpenClaw so you can modify it freely and natively through
-> the OpenClaw Gateway and `openclaw` CLI.
-> With `spec.config.management: operator`, claws are more locked down and reconciled,
-> and to modify them you'd modify the CR instead of working with your agent directly.
-> For exploration and development, use `management:user` 
-
-## One-time setup: your Vertex service account
-
-There is a dropdown of providers and most are simple "add your api key" but Vertex is
-different. Create an SA provide its JSON key:
-
-```sh
-gcloud iam service-accounts create claw-vertex \
-  --display-name="Claw Vertex AI"
-gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
-  --member="serviceAccount:claw-vertex@YOUR_PROJECT_ID.iam.gserviceaccount.com" \
-  --role="roles/aiplatform.user"
-gcloud iam service-accounts keys create sa-key.json \
-  --iam-account=claw-vertex@YOUR_PROJECT_ID.iam.gserviceaccount.com
+```none
+user                                                     operator
+├─────────────────────────────────────────────────────────────┤
+Full freedom                                      Fully locked down
+Power users                                       Regulated kiosks
+User edits persist                       Operator reconciles on restart
 ```
 
-You **paste the contents of `sa-key.json`** into the Deployer — it creates the
-Kubernetes Secret for you.
+| Mode       | User can                                                   | Admin controls                                        | Best for                               |
+| ---------- | ---------------------------------------------------------- | ----------------------------------------------------- | -------------------------------------- |
+| `user`     | Modify persona, install skills, change models, add plugins | Credentials, network egress, proxy boundary           | Developers, power users                |
+| `operator` | Use the assistant as configured                            | Everything: persona, skills, models, network, plugins | Business users, regulated environments |
 
-> [!NOTE]
-> Your OpenClaw agents do not have access to the secrets. 
-> The operator keeps provider keys in Secrets and injects them through a per-Claw proxy
-> that sits between the gateway and external APIs, so the agent itself never sees your
-> raw API key (and for Vertex, the proxy vends GCP tokens on its behalf.
+In between, admins combine mode with network policies, read-only
+persona mounts, and skill allowlists to fine-tune the control level.
+See [Scenario F](docs/enterprise-onboarding-workflows.md#scenario-f-locked-down-kiosk-with-guardrails)
+for the most restrictive example.
 
-## Create an OpenClaw named **Fred** on Vertex (Claude), no model override
+## Repos
 
-1. **Namespace** — your project (e.g. `<your-login>-claw`).
-2. **OpenClaw name** — `fred` (becomes `Fred` in the UI).
-3. **Provider** — `Google Vertex AI (Claude)`.
-4. **Model override** — leave **blank** (uses `claude-sonnet-4-6`).
-5. **GCP Project ID** and **GCP region** (`global`).
-6. **Service Account Key** — paste your `sa-key.json` contents.
-7. Click **Create**. When Fred is Ready, use **Open Control UI** to open the UI and talk to it.
+Clone these so your local AI can read them and guide you, and so
+you can fix and contribute:
 
-## Add a provider/model to a running Claw (OpenRouter + Nemotron)
+| Repo                        | Clone                                                                                                | What it is                                                        |
+| --------------------------- | ---------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| **openclaw**                | [github.com/openclaw/openclaw](https://github.com/openclaw/openclaw)                                 | The OpenClaw agent — config, skills, plugins, the Control UI      |
+| **claw-operator**           | [github.com/redhat-et/claw-operator](https://github.com/redhat-et/claw-operator)                     | The OpenShift operator — defines the `Claw` CR, manages instances |
+| **claw-operator-dashboard** | [github.com/redhat-et/claw-operator-dashboard](https://github.com/redhat-et/claw-operator-dashboard) | The Deployer web app and admin dashboard                          |
+| **claw-collections**        | [github.com/redhat-et/claw-collections](https://github.com/redhat-et/claw-collections)               | Reusable workspace bundles (collections) and examples             |
+| **claw-project**            | [github.com/redhat-et/claw-project](https://github.com/redhat-et/claw-project)                       | This hub — issues and documentation                               |
 
-Once a Claw exists, the **Create** button becomes **Add/update provider**.
+## Documentation
 
-1. Select the same **Namespace** and **OpenClaw name** (`fred`).
-2. **Provider** → `OpenRouter`.
-3. **Model override** → `openrouter/nvidia/nemotron-3-ultra-550b-a55b`.
-4. Paste your **OpenRouter API key** See [https://openrouter.ai](https://openrouter.ai/)
-5. Click **Add/update provider**. The new provider key Secret is added; Fred can
-   now use that model alongside Vertex. You can switch between them. Ask Fred, it'll tell you how.
+### User guides
 
-## Restart and delete
+| Document                                                                   | Description                                                              |
+| -------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| [Deployer Guide](docs/deployer-guide.md)                                   | Using the web app to create, configure, and manage OpenClaw instances    |
+| [Collections Guide](docs/collections-guide.md)                             | Creating and using preconfigured workspace bundles                       |
+| [Enterprise Onboarding Workflows](docs/enterprise-onboarding-workflows.md) | Six deployment scenarios from shared team assistant to locked-down kiosk |
+| [Operator Technical Brief](docs/operator-technical-brief.md)               | Architecture, security model, and operational characteristics            |
 
-- **Restart Fred** — click **Restart** on Fred's row (or the top Restart
-  button) and confirm.
-- **Delete Fred** — click **Delete** and confirm. This removes the Claw, its
-  provider Secret(s), and any uploaded workspace ConfigMap. **The project
-  (namespace) stays.** If you no longer need it, clean it up yourself:
-  `oc delete project <your-namespace>`.
+### Design docs
 
-## Create a new Claw seeded from a claw-collection
-
-A *collection* is a directory tree (agent files, skills, MCP servers, cron) that
-seeds the Claw's workspace on first boot. Seeding requires **Config owner =
-User** and is a **create-time** choice (locked once the Claw exists).
-
-**Upload the `software-qa-mcp` example:**
-
-1. Fill in name, provider, and credentials as above.
-2. **Config owner** → **User**.
-3. **OpenClaw workspace source** → **Upload a folder**, and pick
-   `claw-collections/software-qa-mcp` from your local clone (uploads cap at
-   1 MiB).
-4. Click **Create**.
-
-> Prefer Git? Choose **Git repository** instead:
-> URL `https://github.com/redhat-et/claw-collections.git`, ref `main` (branch or
-> tag — not a SHA), path `software-qa-mcp`.
-
-## Add your own claw-collection
-
-Build your own bundle as a directory tree, then seed a new **User**-managed Claw
-from it (Upload, or your own Git repo). Layout in short:
-
-- `workspace-main/` → `~/.openclaw/workspace/` (`AGENTS.md`, `SOUL.md`, `skills/`, …)
-- `openclaw.json` → merged into the Claw's config (agents, MCP servers, cron)
-- any other top-level folder → copied under `~/.openclaw/`
-
-See `../claw-collections` (its README has the full layout) and the
-`software-qa-mcp/` example for working wiring.
-
+| Document                                                                 | Description                                                                     |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
+| [Enterprise Deployment Design](docs/dev/enterprise-deployment-design.md) | Proposed features: OCI skill delivery, configurable passthroughs, persona modes |
+| [Business Users Configuration](docs/dev/business-users-configuration.md) | Configuration strategies for locked-down business user instances                |
