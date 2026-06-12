@@ -1,3 +1,7 @@
+# Claw Project
+
+We are creating a platform for running OpenClaw agents at scale. Issues for all related repositories will go here, unless they are very strictly related to _only_ that repository. If they lend toward the platform as a whole, issues belong here. This is where we track everything. We do not put code in this repository. This repository is for Issues and Documentation. 
+
 ## The repos — clone these locally
 
 Clone these so your local AI can read them and guide you, and so you can fix and contribute:
