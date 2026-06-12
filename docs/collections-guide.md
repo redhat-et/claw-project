@@ -15,11 +15,11 @@ choice (locked once the Claw exists).
 
 1. Fill in name, provider, and credentials as described in the
    [Deployer Guide](deployer-guide.md).
-2. **Config owner** → **User**.
-3. **OpenClaw workspace source** → **Upload a folder**, and pick
+1. **Config owner** → **User**.
+1. **OpenClaw workspace source** → **Upload a folder**, and pick
    `claw-collections/software-qa-mcp` from your local clone
    (uploads cap at 1 MiB).
-4. Click **Create**.
+1. Click **Create**.
 
 > Prefer Git? Choose **Git repository** instead:
 > URL `https://github.com/redhat-et/claw-collections.git`, ref

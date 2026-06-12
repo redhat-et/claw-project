@@ -14,7 +14,7 @@ instead of or after deploying with this deployer.
 
 You can view your Claw CRs with:
 
-```sh
+```bash
 oc get claws -A
 ```
 
@@ -33,7 +33,7 @@ There is a dropdown of providers and most are simple "add your API
 key" but Vertex is different. Create a service account and provide
 its JSON key:
 
-```sh
+```bash
 gcloud iam service-accounts create claw-vertex \
   --display-name="Claw Vertex AI"
 gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
@@ -56,12 +56,12 @@ creates the Kubernetes Secret for you.
 ## Create an OpenClaw named Fred on Vertex (Claude), no model override
 
 1. **Namespace** — your project (e.g. `<your-login>-claw`).
-2. **OpenClaw name** — `fred` (becomes `Fred` in the UI).
-3. **Provider** — `Google Vertex AI (Claude)`.
-4. **Model override** — leave **blank** (uses `claude-sonnet-4-6`).
-5. **GCP Project ID** and **GCP region** (`global`).
-6. **Service Account Key** — paste your `sa-key.json` contents.
-7. Click **Create**. When Fred is Ready, use **Open Control UI** to
+1. **OpenClaw name** — `fred` (becomes `Fred` in the UI).
+1. **Provider** — `Google Vertex AI (Claude)`.
+1. **Model override** — leave **blank** (uses `claude-sonnet-4-6`).
+1. **GCP Project ID** and **GCP region** (`global`).
+1. **Service Account Key** — paste your `sa-key.json` contents.
+1. Click **Create**. When Fred is Ready, use **Open Control UI** to
    open the UI and talk to it.
 
 ## Add a provider/model to a running Claw (OpenRouter + Nemotron)
@@ -70,12 +70,12 @@ Once a Claw exists, the **Create** button becomes
 **Add/update provider**.
 
 1. Select the same **Namespace** and **OpenClaw name** (`fred`).
-2. **Provider** → `OpenRouter`.
-3. **Model override** →
+1. **Provider** → `OpenRouter`.
+1. **Model override** →
    `openrouter/nvidia/nemotron-3-ultra-550b-a55b`.
-4. Paste your **OpenRouter API key**. See
+1. Paste your **OpenRouter API key**. See
    [openrouter.ai](https://openrouter.ai/).
-5. Click **Add/update provider**. The new provider key Secret is
+1. Click **Add/update provider**. The new provider key Secret is
    added; Fred can now use that model alongside Vertex. You can
    switch between them. Ask Fred, it'll tell you how.
 

@@ -295,9 +295,9 @@ currently a package-level `var`. The `generateProxyConfig` function
 iterates over it unconditionally. Changes needed:
 
 1. Pass the Claw instance's network config into `generateProxyConfig`
-2. Filter `builtinPassthroughDomains` against the allowlist before
+1. Filter `builtinPassthroughDomains` against the allowlist before
    generating routes
-3. When `spec.network.builtinPassthroughs` is nil (not set), preserve
+1. When `spec.network.builtinPassthroughs` is nil (not set), preserve
    current behavior (all builtins allowed) for backward compatibility
 
 ### Feature C: Shared credential management (already works)
@@ -379,9 +379,9 @@ from a template and displays the gateway URL is the lowest-friction
 option. The portal would:
 
 1. Create a Claw CR from a department-specific template
-2. Poll `status.conditions` until `Ready=True`
-3. Display `status.gatewayURL` to the user
-4. Optionally manage idle/resume lifecycle
+1. Poll `status.conditions` until `Ready=True`
+1. Display `status.gatewayURL` to the user
+1. Optionally manage idle/resume lifecycle
 
 ### Feature E: Persona configuration modes
 
@@ -495,13 +495,13 @@ injection. The refactor:
    }
    ```
 
-2. Guard persona injection in `enrichConfigAndNetworkPolicy`:
+1. Guard persona injection in `enrichConfigAndNetworkPolicy`:
    - `skipDefaultPersonality()` — skip when unmanaged
    - `injectBootstrapHook()` — skip when unmanaged
    - `merge.js` seeding of AGENTS.md, SOUL.md, BOOTSTRAP.md — skip
      when unmanaged; use ConfigMap content when configMapRef is set
 
-3. For `image` mode: add ImageVolume mount (same pattern as
+1. For `image` mode: add ImageVolume mount (same pattern as
    `spec.skillImages`) at `/persona/`, add init-config step to
    copy persona files from `/persona/` into workspace.
 
@@ -547,16 +547,16 @@ D is a separate application that consumes the operator's API.
    This determines whether the ImageVolume strategy is available or
    the init container fallback is needed.
 
-2. **Per-user credentials vs shared:** Should each user get their own
+1. **Per-user credentials vs shared:** Should each user get their own
    API key (for cost attribution) or share a team key? The operator
    supports both — separate Secrets per user or shared Secrets across
    CRs.
 
-3. **Namespace strategy:** One namespace for all users (simpler RBAC,
+1. **Namespace strategy:** One namespace for all users (simpler RBAC,
    shared Secrets) or namespace-per-user (stronger isolation, more
    operational overhead)?
 
-4. **Signature verification enforcement:** Should the operator
+1. **Signature verification enforcement:** Should the operator
    verify cosign signatures on skill images before mounting them?
    This would add a hard guarantee that only signed skills from
    trusted publishers can run. Implementation options:
@@ -566,13 +566,13 @@ D is a separate application that consumes the operator's API.
      image signatures on pod admission
    - Both: defense-in-depth
 
-5. **Skill discovery path:** ~~Does OpenClaw support multiple skill
+1. **Skill discovery path:** ~~Does OpenClaw support multiple skill
    directories?~~ **Resolved.** Yes — `skills.load.extraDirs` in
    config accepts an array of additional scan paths. The operator
    injects `extraDirs: ["/skills"]` and mounts ImageVolumes there.
    No symlinks needed.
 
-6. **skillctl as operator dependency:** Should the operator embed
+1. **skillctl as operator dependency:** Should the operator embed
    `skillctl` for the init container fallback, or should it be a
    separate image that the operator references (like `PROXY_IMAGE`
    and `KUBECTL_IMAGE`)? A `SKILLCTL_IMAGE` env var would follow

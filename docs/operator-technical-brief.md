@@ -126,10 +126,10 @@ operator:
 
 1. Validates that only token-based auth is used (rejects client
    certs, exec plugins, basic auth)
-2. Creates a sanitized copy with tokens replaced by placeholders
+1. Creates a sanitized copy with tokens replaced by placeholders
    and cluster CAs replaced by the proxy CA
-3. Mounts the sanitized kubeconfig on the gateway pod
-4. The proxy intercepts API server requests and injects real tokens
+1. Mounts the sanitized kubeconfig on the gateway pod
+1. The proxy intercepts API server requests and injects real tokens
 
 The gateway never holds real cluster tokens.
 
@@ -187,11 +187,11 @@ the operator:
 
 1. Creates a stub ADC (Application Default Credentials) ConfigMap
    with fake credentials
-2. Auto-installs the required plugin
+1. Auto-installs the required plugin
    (`@openclaw/anthropic-vertex-provider`)
-3. The proxy intercepts Google SDK token refresh requests and returns
+1. The proxy intercepts Google SDK token refresh requests and returns
    dummy tokens
-4. Real GCP tokens are injected by the proxy on actual API calls
+1. Real GCP tokens are injected by the proxy on actual API calls
 
 ### Custom providers
 
@@ -244,5 +244,4 @@ The OpenClaw container image version is embedded in the operator
 binary. Upgrading OpenClaw requires rebuilding the operator because
 the operator makes ~40 assumptions about OpenClaw's config schema,
 file paths, CLI commands, wire format identifiers, and container
-internals. See `openclaw-version-coupling.md` for the full
-coupling surface analysis.
+internals.
