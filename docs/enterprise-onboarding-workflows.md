@@ -91,14 +91,14 @@ metadata:
   name: hr-assistant
   namespace: ai-assistants
 spec:
-  config:
-    management: user
   agentFiles:
     applyPolicy: IfMissing
     git:
       url: https://github.com/corp/claw-configs.git
       ref: v1.0.0
       path: hr
+      secretRef:
+        name: corp-git-creds
   credentials:
     - name: anthropic
       provider: anthropic
@@ -112,19 +112,23 @@ spec:
 1. ArgoCD syncs the Claw CR to the cluster
 2. Operator reconciles: creates pod with init-config
 3. init-config clones `hr/` from the Git repo (via proxy)
-4. `workspace-main/` is seeded into the workspace
-5. `openclaw.json` provides department-specific model config
-6. User gets HR-tailored assistant with HR-specific skills
+4. `workspace-main/` is seeded into the workspace — the
+   department's AGENTS.md, SOUL.md, and skills are placed
+   first; the operator's built-in versions use `seedIfMissing`
+   so they do not overwrite them
+5. Operator adds infrastructure skills (PLATFORM.md,
+   KUBERNETES.md) on top
+6. `openclaw.json` provides department-specific model config
+7. User gets HR-tailored assistant with HR-specific skills
 
-**CRD features used:** `config.management: user`,
-`agentFiles.git`, `agentFiles.applyPolicy`, `credentials`.
+**CRD features used:** `agentFiles.git`,
+`agentFiles.applyPolicy`, `agentFiles.git.secretRef`,
+`credentials`.
 
 **Not yet in CRD but needed:**
 
-- `agentFiles.git.secretRef` — for private corporate Git repos
-- Decoupling `agentFiles` from user mode — so ITOps can seed
-  department skills while keeping operator-managed infrastructure
-  skills (PLATFORM.md, KUBERNETES.md)
+- `agentFiles.readOnly` — to protect department persona files
+  from being edited by the agent at runtime
 
 ---
 
@@ -438,14 +442,14 @@ writable for everything else (conversations, user-created files).
 
 Features needed across all scenarios:
 
-| Feature                                         | Scenarios | Priority | Difficulty    |
+| Feature                                         | Scenarios | Priority | Status        |
 | ----------------------------------------------- | --------- | -------- | ------------- |
-| `agentFiles.git.secretRef`                      | B, C, E   | High     | Low           |
-| Decouple `agentFiles` from user mode            | B         | High     | Medium        |
-| `restrictions.personaRef` (read-only persona)   | F         | High     | Medium        |
-| `restrictions.pluginInstallation`               | C, F      | Medium   | Low           |
-| `agentFiles.readOnly` (read-only skills)        | E, F      | Medium   | Medium        |
-| Per-department persona (not just user/operator) | B         | Medium   | Design needed |
+| `agentFiles.git.secretRef`                      | B, C, E   | High     | Done (PR #8)  |
+| Decouple `agentFiles` from user mode            | B         | High     | Done (PR #9)  |
+| `restrictions.personaRef` (read-only persona)   | F         | High     | Done (PR #7)  |
+| `restrictions.pluginInstallation`               | C, F      | Medium   | Done (PR #7)  |
+| `agentFiles.readOnly` (read-only workspace)     | E, F      | Medium   | Planned       |
+| Per-department persona (not just user/operator)  | B         | Medium   | Done (PR #9)  |
 
 Features that already work but may need documentation:
 
