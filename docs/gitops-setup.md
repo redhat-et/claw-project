@@ -368,4 +368,38 @@ from Git, the Claw resource stays running on the cluster —
 it becomes an orphan that ArgoCD no longer tracks. Delete
 orphans manually with `oc delete claw`.
 
+### Resource tracking
+
+ArgoCD annotates every resource it manages with a tracking ID.
+You can inspect it to trace a Claw resource back to its Git
+source:
+
+```bash
+oc get claw <name> -n <namespace> -o jsonpath='{.metadata.annotations.argocd\.argoproj\.io/tracking-id}'
+```
+
+The tracking ID follows the format
+`<app-name>:<api-group>/<kind>:<namespace>/<resource-name>`,
+for example:
+
+```text
+claw-panni:claw.sandbox.redhat.com/Claw:panni-claw/executive-assistant
+```
+
+The Application name (`claw-panni`) links back to the Git
+repo, path, and the exact commit SHA that was last synced:
+
+```bash
+oc get applications.argoproj.io claw-panni -n openshift-gitops \
+  -o jsonpath='Repo:   {.spec.source.repoURL}{"\n"}Path:   {.spec.source.path}{"\n"}Commit: {.status.sync.revision}{"\n"}'
+```
+
+ArgoCD tracks at the **directory** level, not per file. To
+find which file defines a specific resource, grep for the
+resource name in the synced path:
+
+```bash
+grep -rl 'name: executive-assistant' manifests/panni/
+```
+
 [webhook]: https://argo-cd.readthedocs.io/en/stable/operator-manual/webhook/
