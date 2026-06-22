@@ -17,7 +17,7 @@ Each builds on concepts from the previous one.
 | Autonomous agent | E | Unattended agent processing tasks from a queue |
 | Locked-down kiosk | F | Regulated environments with strict guardrails |
 
-Scenarios B, C, E, and F are documented in
+Scenarios B, E, and F are documented in
 [enterprise onboarding workflows](../enterprise-onboarding-workflows.md)
 and will get dedicated walkthrough guides as they are
 validated on test clusters.

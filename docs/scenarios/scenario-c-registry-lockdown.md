@@ -175,7 +175,8 @@ cp manifests/scenarios/scenario-c-registry-lockdown.yaml \
 
 Edit the manifest to use their own secret name, push, and
 ArgoCD handles the rest. The admin creates the per-user API
-key secret in the `<username>-claw` namespace.
+key secret in the matching namespace (`ai-users` for manual
+deploys, `<username>-claw` for GitOps).
 
 ## Verify
 

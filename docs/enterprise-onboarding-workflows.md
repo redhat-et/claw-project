@@ -184,8 +184,8 @@ spec:
 **CRD features used:** `network.builtinPassthroughs`,
 `credentials` (type: none for mirrors), `agentFiles.git`.
 
-**Not yet in CRD but needed:** Nothing — this works today.
-`agentFiles.git.secretRef` for private repos shipped in PR #8.
+**Not yet in CRD but needed:** Nothing — all features are
+shipped, including `agentFiles.git.secretRef` (PR #8).
 
 **Step-by-step walkthrough:**
 [Registry lockdown and internal mirrors](scenarios/scenario-c-registry-lockdown.md)
