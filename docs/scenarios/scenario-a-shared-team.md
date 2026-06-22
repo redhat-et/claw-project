@@ -1,29 +1,23 @@
-# Scenario A: Shared team assistant
+# Your first AI assistant on OpenShift
 
-A team of 5-10 developers shares one AI assistant with shared
-credentials and a default persona. The admin creates one Claw CR
-and one Secret — the operator handles everything else.
+Get a personal AI coding assistant running on your OpenShift
+cluster — then expand it to your whole team. This guide covers
+**Scenario D** (personal assistant) and **Scenario A** (shared
+team assistant). They use the same minimal CRD; the team
+version just adds a second provider and a shared profile.
 
 ## Story
 
-Alex leads a platform engineering team of eight. The team wants
-an AI coding assistant on their OpenShift cluster — no cloud
-SaaS, no data leaving the network. Alex doesn't need per-person
-customization yet; the team just wants a shared assistant they
-can all use from their browsers.
+Jordan is an ML engineer who wants an AI coding assistant on
+the cluster — no cloud SaaS, no data leaving the network.
+Jordan creates a Kubernetes Secret with an Anthropic API key,
+applies a one-field Claw CR, and opens the generated URL in a
+browser. Five minutes from start to finish.
 
-Alex creates a Kubernetes Secret with the team's Anthropic API
-key, applies a minimal Claw CR, and shares the generated URL
-with the team. Ten minutes from start to finish.
-
-## What the team gets
-
-- A browser-based AI coding assistant at a stable Route URL
-- Default persona (AGENTS.md, SOUL.md) seeded by the operator
-- Persistent workspace on a PVC — conversations and
-  customizations survive pod restarts
-- Each team member can customize the persona through the UI;
-  edits persist on the shared PVC
+A week later, Jordan's team lead Alex wants the same thing for
+the whole platform engineering team of eight. Alex adds a
+second provider, seeds a shared profile from Git, and shares
+the URL. The team is up and running in ten minutes.
 
 ## Prerequisites
 
@@ -33,11 +27,96 @@ with the team. Ten minutes from start to finish.
 - At least one LLM provider API key (Anthropic, Google, or
   other supported provider)
 
-## The manifest
+## Part one: personal assistant (Scenario D)
 
-A ready-to-use manifest is available in the
-[claw-collections][collections] repository at
-`manifests/scenarios/scenario-a-shared-team.yaml`.
+### The manifest
+
+The simplest possible Claw CR — just credentials:
+
+```yaml
+apiVersion: claw.sandbox.redhat.com/v1alpha1
+kind: Claw
+metadata:
+  name: jordan-assistant
+spec:
+  credentials:
+    - name: anthropic
+      provider: anthropic
+      secretRef:
+        - name: jordan-anthropic
+          key: api-key
+```
+
+A ready-to-use version is at
+`manifests/scenarios/scenario-d-power-user.yaml` in the
+[claw-collections][collections] repository.
+
+The `provider` field tells the operator to infer the credential
+type, API domain, and authentication headers automatically:
+
+| Provider | Inferred type | Domain | Auth header |
+| -------- | ------------- | ------ | ----------- |
+| `anthropic` | `apiKey` | `api.anthropic.com` | `x-api-key` |
+| `google` | `apiKey` | `.googleapis.com` | `x-goog-api-key` |
+| `openai` | `bearer` | `api.openai.com` | `Authorization: Bearer` |
+| `xai` | `bearer` | `api.x.ai` | `Authorization: Bearer` |
+
+### Deploy
+
+Create a namespace, a secret, and apply the CR:
+
+```bash
+oc new-project ai-dev
+
+oc create secret generic jordan-anthropic \
+  --from-literal=api-key='sk-ant-...' \
+  -n ai-dev
+```
+
+Save the manifest as `jordan-assistant.yaml` (add
+`namespace: ai-dev` under `metadata`) and apply:
+
+```bash
+oc apply -f jordan-assistant.yaml
+```
+
+### Verify
+
+Check that the instance is ready:
+
+```bash
+oc get claw jordan-assistant -n ai-dev \
+  -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}'
+# Expected: True
+```
+
+Get the access URL:
+
+```bash
+oc get claw jordan-assistant -n ai-dev \
+  -o jsonpath='{.status.gatewayURL}'
+```
+
+Open the URL in a browser. You should see the OpenClaw
+interface ready to accept prompts.
+
+### What you get
+
+- A browser-based AI coding assistant at a stable Route URL
+- Persistent workspace on a PVC — conversations and
+  customizations survive pod restarts
+- Full control over persona, skills, and model configuration
+  through the OpenClaw UI
+- The proxy enforces the credential security boundary — your
+  API key never reaches the gateway container
+
+## Part two: expand to a shared team (Scenario A)
+
+The same pattern scales to a team of 5-10 developers. The
+changes are small: add a second provider, optionally seed a
+shared profile, and share the URL.
+
+### The manifest
 
 ```yaml
 apiVersion: claw.sandbox.redhat.com/v1alpha1
@@ -64,35 +143,25 @@ spec:
       path: enterprise-profiles/shared-team
 ```
 
+A ready-to-use version is at
+`manifests/scenarios/scenario-a-shared-team.yaml` in the
+[claw-collections][collections] repository.
+
+**What changed from the personal version:**
+
+- **Second provider** — the team can choose between Anthropic
+  and Gemini at runtime
+- **`agentFiles`** — seeds a general-purpose development
+  assistant profile (AGENTS.md, SOUL.md, TOOLS.md) from the
+  [shared-team collection][profile] so the team starts with a
+  useful persona instead of a blank slate
+- **`applyPolicy: IfMissing`** — seeded files do not overwrite
+  any customizations the team has already made on the PVC
+
 The `agentFiles` block is optional. Without it, the operator
-seeds a generic default persona. With it, the team gets a
-general-purpose development assistant profile (AGENTS.md,
-SOUL.md, TOOLS.md) from the [shared-team collection][profile].
-`applyPolicy: IfMissing` means seeded files do not overwrite
-any customizations the team has already made on the PVC.
+seeds a generic default persona.
 
-The `provider` field tells the operator to infer the
-credential type, API domain, and authentication headers
-automatically:
-
-| Provider | Inferred type | Domain | Auth header |
-| -------- | ------------- | ------ | ----------- |
-| `anthropic` | `apiKey` | `api.anthropic.com` | `x-api-key` |
-| `google` | `apiKey` | `.googleapis.com` | `x-goog-api-key` |
-| `openai` | `bearer` | `api.openai.com` | `Authorization: Bearer` |
-| `xai` | `bearer` | `api.x.ai` | `Authorization: Bearer` |
-
-[collections]: https://github.com/redhat-et/claw-collections
-[profile]: https://github.com/redhat-et/claw-collections/tree/main/enterprise-profiles/shared-team
-
-## Deploy
-
-There are two ways to deploy: manually with `oc apply`, or
-via GitOps with ArgoCD. Both produce the same result.
-
-### Option A: Manual deploy
-
-Create a namespace and the API key secrets:
+### Deploy
 
 ```bash
 oc new-project ai-dev
@@ -108,35 +177,66 @@ oc create secret generic team-gemini \
   -n ai-dev
 ```
 
-Save the manifest above as `dev-team.yaml` (add
-`namespace: ai-dev` under `metadata`) and apply:
+Save the manifest as `dev-team.yaml` (add `namespace: ai-dev`
+under `metadata`) and apply:
 
 ```bash
 oc apply -f dev-team.yaml
 ```
 
-### Option B: GitOps via ArgoCD
+### Verify
 
-If your cluster has [Red Hat OpenShift GitOps][gitops]
-configured with the claw-collections ApplicationSet (see
-[GitOps setup](../gitops-setup.md)), you can deploy by
-pushing the manifest to Git instead.
+```bash
+oc get claw dev-team -n ai-dev \
+  -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}'
+# Expected: True
+```
 
-Clone the repository and copy the manifest into your
-directory:
+Check that pods are running:
+
+```bash
+oc get pods -n ai-dev -l app.kubernetes.io/instance=dev-team
+```
+
+### Share with the team
+
+Get the access URL and send it to your team members:
+
+```bash
+oc get claw dev-team -n ai-dev \
+  -o jsonpath='{.status.gatewayURL}'
+```
+
+Anyone with the URL can access the assistant. The
+authentication token is embedded in the URL fragment
+(after `#`). Per RFC 3986, fragments are not sent in HTTP
+requests, so the token does not appear in server access logs
+or proxy logs. It is visible in the browser address bar,
+history, and bookmarks — treat the URL as a credential and
+share it through a secure channel.
+
+## Deploy via GitOps
+
+Both manifests work with [Red Hat OpenShift GitOps][gitops]
+(ArgoCD). If your cluster has the claw-collections
+ApplicationSet configured (see
+[GitOps setup](../gitops-setup.md)), deploy by pushing the
+manifest to Git instead of running `oc apply`.
+
+Clone the repository and copy a manifest into your directory:
 
 ```bash
 git clone git@github.com:redhat-et/claw-collections.git
 cd claw-collections
-cp manifests/scenarios/scenario-a-shared-team.yaml \
-   manifests/<your-username>/dev-team.yaml
+cp manifests/scenarios/scenario-d-power-user.yaml \
+   manifests/<your-username>/my-assistant.yaml
 ```
 
 Push to trigger ArgoCD sync:
 
 ```bash
-git add manifests/<your-username>/dev-team.yaml
-git commit -m "Add shared team assistant"
+git add manifests/<your-username>/my-assistant.yaml
+git commit -m "Add my assistant"
 git push origin main
 ```
 
@@ -145,7 +245,7 @@ automatically and syncs the Claw CR. Create the provider
 secret in that namespace:
 
 ```bash
-oc create secret generic team-anthropic \
+oc create secret generic jordan-anthropic \
   --from-literal=api-key='sk-ant-...' \
   -n <your-username>-claw
 ```
@@ -155,73 +255,6 @@ operator does not crash if the secret is missing — the
 instance stays in `Ready: False` until the secret exists.
 
 [gitops]: https://docs.openshift.com/gitops/latest/understanding_openshift_gitops/about-redhat-openshift-gitops.html
-
-## Verify
-
-### Check the Claw status
-
-```bash
-oc get claw dev-team -n ai-dev -o yaml | grep -A 20 status:
-```
-
-Look for the `Ready` condition set to `True`:
-
-```yaml
-status:
-  conditions:
-    - type: Ready
-      status: "True"
-      reason: Ready
-  gatewayURL: https://dev-team-ai-dev.apps.cluster.example.com/#...
-  gatewayTokenSecretRef: dev-team-gateway-token
-```
-
-### Check that pods are running
-
-```bash
-oc get pods -n ai-dev -l app.kubernetes.io/instance=dev-team
-```
-
-You should see the gateway and proxy pods in `Running` state.
-
-### Get the access URL
-
-The `status.gatewayURL` field contains the full URL with the
-authentication token fragment:
-
-```bash
-oc get claw dev-team -n ai-dev \
-  -o jsonpath='{.status.gatewayURL}'
-```
-
-Alternatively, retrieve the Route and token separately:
-
-```bash
-# Route URL
-oc get route -n ai-dev -l app.kubernetes.io/instance=dev-team \
-  -o jsonpath='{.items[0].spec.host}'
-
-# Authentication token
-oc get secret dev-team-gateway-token -n ai-dev \
-  -o jsonpath='{.data.token}' | base64 -d
-```
-
-### Test access
-
-Open the `gatewayURL` in a browser. You should see the
-OpenClaw interface ready to accept prompts.
-
-## Share with the team
-
-Send the `gatewayURL` to your team members. Anyone with the
-URL (which includes the auth token) can access the assistant.
-
-The default authentication mode is token-based — the token is
-embedded in the URL fragment (after `#`). Per RFC 3986,
-fragments are not sent in HTTP requests, so the token does
-not appear in server access logs or proxy logs. It is visible
-in the browser address bar, history, and bookmarks — treat
-the URL as a credential and share it through a secure channel.
 
 ## What happens behind the scenes
 
@@ -233,19 +266,19 @@ When the Claw CR is applied, the operator:
 1. Creates a PVC for persistent workspace storage
 1. Creates a Route for external access
 1. Generates an authentication token Secret
-1. Seeds the default persona files (AGENTS.md, SOUL.md) into
-   the workspace via the init-config container
+1. Seeds persona files (AGENTS.md, SOUL.md) into the workspace
+   via the init-config container
 
-The team's API key never reaches the gateway container — the
-proxy intercepts outbound requests and injects credentials at
-the network level.
+The API key never reaches the gateway container — the proxy
+intercepts outbound requests and injects credentials at the
+network level.
 
 ## Cleanup
 
 To remove the deployment:
 
 ```bash
-oc delete claw dev-team -n ai-dev
+oc delete claw jordan-assistant -n ai-dev
 ```
 
 The operator deletes the gateway, proxy, and Route. The PVC
@@ -253,7 +286,8 @@ is retained by default so workspace data is not lost
 accidentally. To remove it:
 
 ```bash
-oc delete pvc -n ai-dev -l app.kubernetes.io/instance=dev-team
+oc delete pvc -n ai-dev \
+  -l app.kubernetes.io/instance=jordan-assistant
 ```
 
 To remove the secrets and namespace entirely:
@@ -268,5 +302,6 @@ oc delete project ai-dev
   [Scenario B](../enterprise-onboarding-workflows.md#scenario-b-per-department-assistants-with-curated-profiles)
   to seed department-specific personas and skills from a
   Git repo
-- **Credential separation:** Create one Claw CR per developer
-  with individual API keys for per-person cost attribution
+
+[collections]: https://github.com/redhat-et/claw-collections
+[profile]: https://github.com/redhat-et/claw-collections/tree/main/enterprise-profiles/shared-team
