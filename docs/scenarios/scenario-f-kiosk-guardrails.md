@@ -185,50 +185,57 @@ oc exec -n ai-finance "$POD" -- \
 
 ### Layer 2: Config — mergeMode overwrite
 
-Delete the pod and verify config resets on restart:
+Inject a test value into the config, restart the pod, and
+verify the change is gone:
 
 ```bash
-oc delete pod -n ai-finance "$POD"
+# Add a test key to openclaw.json
+oc exec -n ai-finance "$POD" -- \
+  sh -c 'cat /home/node/.openclaw/openclaw.json \
+    | sed "s/^{/{\"_test\":\"should-be-removed\",/" \
+    > /tmp/oc.json && mv /tmp/oc.json /home/node/.openclaw/openclaw.json'
 
-# Wait for new pod
+# Restart the pod
+oc delete pod -n ai-finance "$POD"
 oc wait --for=condition=Ready pod \
   -l app.kubernetes.io/instance=finance-analyst \
   -n ai-finance --timeout=120s
-```
 
-Any runtime config changes made through the UI are discarded.
-
-### Layer 3: Persona — read-only files
-
-```bash
+# Verify the test key was removed by mergeMode: overwrite
 NEW_POD=$(oc get pods -n ai-finance \
   -l app.kubernetes.io/instance=finance-analyst,app.kubernetes.io/component=gateway \
   -o jsonpath='{.items[0].metadata.name}')
 
-# SOUL.md should be read-only
+oc exec -n ai-finance "$NEW_POD" -- \
+  grep -q '_test' /home/node/.openclaw/openclaw.json \
+  && echo "FAIL: config change survived restart" \
+  || echo "OK: config was reset by mergeMode: overwrite"
+```
+
+### Layer 3: Persona — read-only files
+
+```bash
+# SOUL.md should be read-only (write attempt must fail)
 oc exec -n ai-finance "$NEW_POD" -- \
   sh -c 'echo test >> /home/node/.openclaw/workspace/SOUL.md' \
-  2>&1 | grep -q "Read-only" \
-  && echo "OK: SOUL.md is read-only" \
-  || echo "FAIL: SOUL.md is writable"
+  && echo "FAIL: SOUL.md is writable" \
+  || echo "OK: SOUL.md is read-only"
 
 # AGENTS.md should be read-only
 oc exec -n ai-finance "$NEW_POD" -- \
   sh -c 'echo test >> /home/node/.openclaw/workspace/AGENTS.md' \
-  2>&1 | grep -q "Read-only" \
-  && echo "OK: AGENTS.md is read-only" \
-  || echo "FAIL: AGENTS.md is writable"
+  && echo "FAIL: AGENTS.md is writable" \
+  || echo "OK: AGENTS.md is read-only"
 ```
 
 ### Layer 4: Skills — read-only skill directory
 
 ```bash
-# Cannot create a new skill
+# Cannot create a new skill (write attempt must fail)
 oc exec -n ai-finance "$NEW_POD" -- \
-  sh -c 'mkdir -p /home/node/.openclaw/workspace/skills/evil && echo test > /home/node/.openclaw/workspace/skills/evil/SKILL.md' \
-  2>&1 | grep -q "Read-only" \
-  && echo "OK: skills/ is read-only" \
-  || echo "FAIL: skills/ is writable"
+  sh -c 'echo test > /home/node/.openclaw/workspace/skills/evil-SKILL.md' \
+  && echo "FAIL: skills/ is writable" \
+  || echo "OK: skills/ is read-only"
 ```
 
 ### Layer 5: Plugins — installation blocked
