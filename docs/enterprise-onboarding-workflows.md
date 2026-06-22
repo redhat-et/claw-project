@@ -47,6 +47,9 @@ else.
 
 **Not yet in CRD but needed:** Nothing — this works today.
 
+**Step-by-step walkthrough:**
+[Scenario A: Shared team assistant](scenarios/scenario-a-shared-team.md)
+
 ---
 
 ## Scenario B: Per-department assistants with curated profiles
