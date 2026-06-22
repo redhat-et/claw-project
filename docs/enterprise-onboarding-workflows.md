@@ -166,8 +166,6 @@ spec:
       - github.com
       - codeload.github.com
       # npm, openrouter, clawhub — blocked
-  config:
-    management: user
   agentFiles:
     git:
       url: https://github.com/corp/claw-configs.git
@@ -184,12 +182,13 @@ spec:
 5. Per-user API key enables cost attribution
 
 **CRD features used:** `network.builtinPassthroughs`,
-`credentials` (type: none for mirrors), `config.management`,
-`agentFiles.git`.
+`credentials` (type: none for mirrors), `agentFiles.git`.
 
-**Not yet in CRD but needed:**
+**Not yet in CRD but needed:** Nothing — this works today.
+`agentFiles.git.secretRef` for private repos shipped in PR #8.
 
-- `agentFiles.git.secretRef` — the corp Git repo is private
+**Step-by-step walkthrough:**
+[Registry lockdown and internal mirrors](scenarios/scenario-c-registry-lockdown.md)
 
 ---
 

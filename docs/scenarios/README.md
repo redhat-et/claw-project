@@ -12,9 +12,10 @@ Each builds on concepts from the previous one.
 | Guide | Scenarios | Audience |
 | ----- | --------- | -------- |
 | [Your first AI assistant](scenario-a-shared-team.md) | D, A | Individual developer, then shared team |
+| [Registry lockdown](scenario-c-registry-lockdown.md) | C | Block public registries, use internal mirrors, per-user keys |
 | Per-department profiles | B | IT admin deploying tailored assistants per department |
 | Autonomous agent | E | Unattended agent processing tasks from a queue |
-| Locked-down kiosk | C, F | Regulated environments with strict guardrails |
+| Locked-down kiosk | F | Regulated environments with strict guardrails |
 
 Scenarios B, C, E, and F are documented in
 [enterprise onboarding workflows](../enterprise-onboarding-workflows.md)
