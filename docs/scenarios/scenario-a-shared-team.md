@@ -217,9 +217,11 @@ Send the `gatewayURL` to your team members. Anyone with the
 URL (which includes the auth token) can access the assistant.
 
 The default authentication mode is token-based — the token is
-embedded in the URL fragment (after `#`). It never leaves the
-browser and is not sent to the server in HTTP headers, so it
-won't appear in proxy logs.
+embedded in the URL fragment (after `#`). Per RFC 3986,
+fragments are not sent in HTTP requests, so the token does
+not appear in server access logs or proxy logs. It is visible
+in the browser address bar, history, and bookmarks — treat
+the URL as a credential and share it through a secure channel.
 
 ## What happens behind the scenes
 
@@ -263,7 +265,8 @@ oc delete project ai-dev
 ## Next steps
 
 - **Per-department customization:** See
-  [Scenario B](scenario-b-department-profiles.md) to seed
-  department-specific personas and skills from a Git repo
+  [Scenario B](../enterprise-onboarding-workflows.md#scenario-b-per-department-assistants-with-curated-profiles)
+  to seed department-specific personas and skills from a
+  Git repo
 - **Credential separation:** Create one Claw CR per developer
   with individual API keys for per-person cost attribution
