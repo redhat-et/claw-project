@@ -48,7 +48,7 @@ else.
 **Not yet in CRD but needed:** Nothing — this works today.
 
 **Step-by-step walkthrough:**
-[Scenario A: Shared team assistant](scenarios/scenario-a-shared-team.md)
+[Your first AI assistant](scenarios/scenario-a-shared-team.md#part-two-expand-to-a-shared-team-scenario-a)
 
 ---
 
@@ -208,8 +208,6 @@ metadata:
   name: power-user
   namespace: ai-dev
 spec:
-  config:
-    management: user
   credentials:
     - name: anthropic
       provider: anthropic
@@ -226,9 +224,15 @@ spec:
 4. Edits persist on PVC across restarts
 5. Proxy still enforces credential security boundary
 
-**CRD features used:** `config.management: user`, `credentials`.
+**CRD features used:** `credentials`. The `config.management:
+user` field is being deprecated — the same result is achieved
+with a minimal CR that omits `agentFiles` and `readOnly`,
+letting the user configure everything through the UI.
 
 **Not yet in CRD but needed:** Nothing — this works today.
+
+**Step-by-step walkthrough:**
+[Your first AI assistant](scenarios/scenario-a-shared-team.md#part-one-personal-assistant-scenario-d)
 
 ---
 
