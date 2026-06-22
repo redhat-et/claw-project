@@ -208,8 +208,6 @@ metadata:
   name: power-user
   namespace: ai-dev
 spec:
-  config:
-    management: user
   credentials:
     - name: anthropic
       provider: anthropic
