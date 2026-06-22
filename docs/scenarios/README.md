@@ -15,9 +15,9 @@ Each builds on concepts from the previous one.
 | [Registry lockdown](scenario-c-registry-lockdown.md) | C | Block public registries, use internal mirrors, per-user keys |
 | Per-department profiles | B | IT admin deploying tailored assistants per department |
 | Autonomous agent | E | Unattended agent processing tasks from a queue |
-| Locked-down kiosk | F | Regulated environments with strict guardrails |
+| [Locked-down kiosk](scenario-f-kiosk-guardrails.md) | F | Regulated environments with strict guardrails |
 
-Scenarios B, E, and F are documented in
+Scenarios B and E are documented in
 [enterprise onboarding workflows](../enterprise-onboarding-workflows.md)
 and will get dedicated walkthrough guides as they are
 validated on test clusters.
