@@ -4,12 +4,12 @@ Recommended practices for running OpenClaw in production on
 OpenShift. Each topic links to a detailed guide where one
 exists; topics marked *planned* are coming soon.
 
-## GitOps deployment with ArgoCD
+## GitOps deployment with Argo CD
 
-Deploy and manage Claw instances declaratively through Git.
-ArgoCD watches the claw-collections repository and
-automatically syncs Claw resources to the cluster. Each user
-gets a subdirectory under `manifests/` — ArgoCD creates an
+Deploy and manage OpenClaw instances declaratively through Git.
+Argo CD watches the claw-collections repository and
+automatically syncs OpenClaw resources to the cluster. Each user
+gets a subdirectory under `manifests/` — Argo CD creates an
 Application per directory, targeting the matching namespace.
 
 See [GitOps setup guide](gitops-setup.md) for the full
@@ -40,7 +40,7 @@ multi-user deployments.
 
 ## Upgrade procedures
 
-*Planned.* Rolling upgrade strategies for the Claw operator
+*Planned.* Rolling upgrade strategies for the OpenClaw operator
 and OpenClaw instances with zero-downtime considerations.
 
 ## Monitoring and observability

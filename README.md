@@ -15,12 +15,12 @@ completely locked-down kiosk to full self-service.
 
 ## User personas
 
-| Persona           | What they do                                                                   | Where to start                                                        |
-| ----------------- | ------------------------------------------------------------------------------ | --------------------------------------------------------------------- |
-| **Cluster Admin** | Deploys instances via GitOps, sets security policies, manages credentials      | [Deployment scenarios](docs/scenarios/)                               |
-| **Power User**    | Self-manages their OpenClaw with full control over persona, skills, and models | [Deployer guide](docs/deployer-guide.md)                              |
-| **Business User** | Uses a curated assistant (HR, Sales, etc.) preconfigured by admin              | [Enterprise onboarding](docs/enterprise-onboarding-workflows.md)      |
-| **Developer**     | Codes with OpenClaw, customizes workspace, creates collections                 | [Collections guide](docs/collections-guide.md)                        |
+| Persona           | What they do                                                                   | Where to start                                                                 |
+| ----------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
+| **Cluster Admin** | Deploys instances via GitOps, sets security policies, manages credentials      | [Deployment scenarios](docs/scenarios/)                                        |
+| **Power User**    | Self-manages their OpenClaw with full control over persona, skills, and models | [Deployer guide](docs/deployer-guide.md)                                       |
+| **Business User** | Uses a curated assistant (HR, Sales, etc.) preconfigured by admin              | [Enterprise onboarding](docs/enterprise-onboarding-workflows.md) (Scenario B)  |
+| **Developer**     | Codes with OpenClaw, customizes workspace, creates collections                 | [Collections guide](docs/collections-guide.md)                                 |
 
 ## The management spectrum
 
@@ -66,7 +66,7 @@ Step-by-step scenario walkthroughs — start here.
 
 | Guide | What you'll build |
 | ----- | ----------------- |
-| [Your first AI assistant](docs/scenarios/scenario-a-shared-team.md) | Personal instance, then a shared team setup |
+| [Your first AI assistant](docs/scenarios/scenario-a-shared-team.md) | Personal instance (D), then a shared team setup (A) |
 | [Registry lockdown](docs/scenarios/scenario-c-registry-lockdown.md) | Block public registries, use internal mirrors |
 | [Locked-down kiosk](docs/scenarios/scenario-f-kiosk-guardrails.md) | Regulated environment with strict guardrails |
 
@@ -82,9 +82,9 @@ index.
 
 | Topic | Status |
 | ----- | ------ |
-| [GitOps deployment with ArgoCD](docs/gitops-setup.md) | Available |
+| [GitOps deployment with Argo CD](docs/gitops-setup.md) | Available |
 | [Git-based change tracking](docs/git-change-tracking.md) | Available |
-| Cost attribution, secret management, upgrades, monitoring | Planned |
+| [Cost attribution](docs/operations-guide.md#cost-attribution-strategies), [secret management](docs/operations-guide.md#secret-management-patterns), [upgrades](docs/operations-guide.md#upgrade-procedures), [monitoring](docs/operations-guide.md#monitoring-and-observability) | Planned |
 
 ### Reference
 
