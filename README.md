@@ -15,12 +15,12 @@ completely locked-down kiosk to full self-service.
 
 ## User personas
 
-| Persona           | What they do                                                                   | Where to start                                                                |
-| ----------------- | ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
-| **Cluster Admin** | Deploys instances via GitOps, sets security policies, manages credentials      | [Enterprise Onboarding Workflows](docs/enterprise-onboarding-workflows.md)    |
-| **Power User**    | Self-manages their OpenClaw with full control over persona, skills, and models | [Deployer Guide](docs/deployer-guide.md)                                      |
-| **Business User** | Uses a curated assistant (HR, Sales, etc.) preconfigured by admin              | [Enterprise Onboarding](docs/enterprise-onboarding-workflows.md) (Scenario B) |
-| **Developer**     | Codes with OpenClaw, customizes workspace, creates collections                 | [Collections Guide](docs/collections-guide.md)                                |
+| Persona           | What they do                                                                   | Where to start                                                                 |
+| ----------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
+| **Cluster Admin** | Deploys instances via GitOps, sets security policies, manages credentials      | [Deployment scenarios](docs/scenarios/)                                        |
+| **Power User**    | Self-manages their OpenClaw with full control over persona, skills, and models | [Deployer guide](docs/deployer-guide.md)                                       |
+| **Business User** | Uses a curated assistant (HR, Sales, etc.) preconfigured by admin              | [Enterprise onboarding](docs/enterprise-onboarding-workflows.md) (Scenario B)  |
+| **Developer**     | Codes with OpenClaw, customizes workspace, creates collections                 | [Collections guide](docs/collections-guide.md)                                 |
 
 ## The management spectrum
 
@@ -42,7 +42,7 @@ User edits persist                       Operator reconciles on restart
 
 In between, admins combine mode with network policies, read-only
 persona mounts, and skill allowlists to fine-tune the control level.
-See [Scenario F](docs/enterprise-onboarding-workflows.md#scenario-f-locked-down-kiosk-with-guardrails)
+See [Scenario F](docs/scenarios/scenario-f-kiosk-guardrails.md)
 for the most restrictive example.
 
 ## Repos
@@ -60,18 +60,47 @@ you can fix and contribute:
 
 ## Documentation
 
-### User guides
+### Getting started
 
-| Document                                                                   | Description                                                              |
-| -------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| [Deployer Guide](docs/deployer-guide.md)                                   | Using the web app to create, configure, and manage OpenClaw instances    |
-| [Collections Guide](docs/collections-guide.md)                             | Creating and using preconfigured workspace bundles                       |
-| [Enterprise Onboarding Workflows](docs/enterprise-onboarding-workflows.md) | Six deployment scenarios from shared team assistant to locked-down kiosk |
-| [Operator Technical Brief](docs/operator-technical-brief.md)               | Architecture, security model, and operational characteristics            |
+Step-by-step scenario walkthroughs — start here.
+
+| Guide | What you'll build |
+| ----- | ----------------- |
+| [Your first AI assistant](docs/scenarios/scenario-a-shared-team.md) | Personal instance (D), then a shared team setup (A) |
+| [Registry lockdown](docs/scenarios/scenario-c-registry-lockdown.md) | Block public registries, use internal mirrors |
+| [Locked-down kiosk](docs/scenarios/scenario-f-kiosk-guardrails.md) | Regulated environment with strict guardrails |
+
+Per-department profiles (Scenario B) and autonomous agent
+(Scenario E) walkthroughs are planned. See
+[all scenarios](docs/scenarios/) for the full list.
+
+### Operations guide
+
+Recommended practices for running OpenClaw well. See the
+[operations guide](docs/operations-guide.md) for the full
+index.
+
+| Topic | Status |
+| ----- | ------ |
+| [GitOps deployment with Argo CD](docs/gitops-setup.md) | Available |
+| [Git-based change tracking](docs/git-change-tracking.md) | Available |
+| [Cost attribution](docs/operations-guide.md#cost-attribution-strategies), [secret management](docs/operations-guide.md#secret-management-patterns), [upgrades](docs/operations-guide.md#upgrade-procedures), [monitoring](docs/operations-guide.md#monitoring-and-observability) | Planned |
+
+### Reference
+
+Deep-dive material for evaluation, architecture, and
+customization.
+
+| Document | Description |
+| -------- | ----------- |
+| [Enterprise onboarding workflows](docs/enterprise-onboarding-workflows.md) | Six deployment scenarios — overview and CRD gap analysis |
+| [Operator technical brief](docs/operator-technical-brief.md) | Architecture, security model, and operational characteristics |
+| [Collections guide](docs/collections-guide.md) | Creating and using preconfigured workspace bundles |
+| [Deployer guide](docs/deployer-guide.md) | Using the web app to manage OpenClaw instances |
 
 ### Design docs
 
-| Document                                                                 | Description                                                                     |
-| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
-| [Enterprise Deployment Design](docs/dev/enterprise-deployment-design.md) | Proposed features: OCI skill delivery, configurable passthroughs, persona modes |
-| [Business Users Configuration](docs/dev/business-users-configuration.md) | Configuration strategies for locked-down business user instances                |
+| Document | Description |
+| -------- | ----------- |
+| [Enterprise deployment design](docs/dev/enterprise-deployment-design.md) | Proposed features: OCI skill delivery, configurable passthroughs, persona modes |
+| [Business users configuration](docs/dev/business-users-configuration.md) | Configuration strategies for locked-down business user instances |
