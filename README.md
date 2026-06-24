@@ -15,12 +15,12 @@ completely locked-down kiosk to full self-service.
 
 ## User personas
 
-| Persona           | What they do                                                                   | Where to start                                                                |
-| ----------------- | ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
-| **Cluster Admin** | Deploys instances via GitOps, sets security policies, manages credentials      | [Enterprise Onboarding Workflows](docs/enterprise-onboarding-workflows.md)    |
-| **Power User**    | Self-manages their OpenClaw with full control over persona, skills, and models | [Deployer Guide](docs/deployer-guide.md)                                      |
-| **Business User** | Uses a curated assistant (HR, Sales, etc.) preconfigured by admin              | [Enterprise Onboarding](docs/enterprise-onboarding-workflows.md) (Scenario B) |
-| **Developer**     | Codes with OpenClaw, customizes workspace, creates collections                 | [Collections Guide](docs/collections-guide.md)                                |
+| Persona           | What they do                                                                   | Where to start                                                        |
+| ----------------- | ------------------------------------------------------------------------------ | --------------------------------------------------------------------- |
+| **Cluster Admin** | Deploys instances via GitOps, sets security policies, manages credentials      | [Deployment scenarios](docs/scenarios/)                               |
+| **Power User**    | Self-manages their OpenClaw with full control over persona, skills, and models | [Deployer guide](docs/deployer-guide.md)                              |
+| **Business User** | Uses a curated assistant (HR, Sales, etc.) preconfigured by admin              | [Enterprise onboarding](docs/enterprise-onboarding-workflows.md)      |
+| **Developer**     | Codes with OpenClaw, customizes workspace, creates collections                 | [Collections guide](docs/collections-guide.md)                        |
 
 ## The management spectrum
 
@@ -42,7 +42,7 @@ User edits persist                       Operator reconciles on restart
 
 In between, admins combine mode with network policies, read-only
 persona mounts, and skill allowlists to fine-tune the control level.
-See [Scenario F](docs/enterprise-onboarding-workflows.md#scenario-f-locked-down-kiosk-with-guardrails)
+See [Scenario F](docs/scenarios/scenario-f-kiosk-guardrails.md)
 for the most restrictive example.
 
 ## Repos
