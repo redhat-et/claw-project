@@ -95,6 +95,7 @@ customization.
 | -------- | ----------- |
 | [Enterprise onboarding workflows](docs/enterprise-onboarding-workflows.md) | Six deployment scenarios — overview and CRD gap analysis |
 | [Operator technical brief](docs/operator-technical-brief.md) | Architecture, security model, and operational characteristics |
+| [Proxy security FAQ](docs/proxy-security-faq.md) | How the credential proxy works, what it enforces, and remaining attack surface |
 | [Collections guide](docs/collections-guide.md) | Creating and using preconfigured workspace bundles |
 | [Deployer guide](docs/deployer-guide.md) | Using the web app to manage OpenClaw instances |
 
