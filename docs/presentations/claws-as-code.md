@@ -13,6 +13,7 @@ footer: "Red Hat — Claws-as-Code"
 Declarative AI Assistants on OpenShift
 
 Pavel Anni · Office of the CTO · Red Hat
+June 2026
 
 <span class="tag">openclaw</span> <span class="tag">openshift</span> <span class="tag">agentic-infra</span>
 
@@ -249,6 +250,8 @@ Timing: ~60s
 - **Operator** — github.com/redhat-et/claw-operator
 
 Deploy a Claw on your cluster in 5 minutes.
+
+Contact: panni@redhat.com
 
 ---
 
