@@ -1,4 +1,4 @@
-# Proxy Security FAQ
+# Proxy security FAQ
 
 Common questions about the claw-operator's credential proxy:
 how it protects API keys, what it can and cannot enforce, and
@@ -36,14 +36,18 @@ environment.
 
 ## Can a malicious agent or skill bypass the proxy?
 
-No. The `HTTP_PROXY` environment variable is the cooperative
-mechanism — it tells well-behaved HTTP clients to route through the
-proxy. A process running inside the container could technically
-unset it or make direct TCP connections.
+Not when NetworkPolicy is enforced by the cluster's CNI plugin,
+which is the case on any standard OpenShift or Kubernetes cluster
+with a conformant CNI (Calico, OVN-Kubernetes, Cilium, etc.).
 
-But the enforcement comes from **Kubernetes NetworkPolicy**, not
-the environment variable. The gateway pod's egress NetworkPolicy
-restricts it to exactly two destinations:
+The `HTTP_PROXY` environment variable is the cooperative
+mechanism — it tells well-behaved HTTP clients to route through
+the proxy. A process running inside the container could
+technically unset it or make direct TCP connections.
+
+But the real enforcement comes from **Kubernetes NetworkPolicy**,
+not the environment variable. The gateway pod's egress
+NetworkPolicy restricts it to exactly two destinations:
 
 - The proxy pod on port 8080
 - DNS (ports 53/5353)
@@ -59,7 +63,7 @@ port 443.
 | Unset `HTTP_PROXY` | All HTTPS calls fail (NetworkPolicy blocks direct 443) |
 | Set `HTTP_PROXY` to a rogue host | Connection dropped (egress only to `claw-proxy:8080`) |
 | Talk to proxy but request unauthorized domain | Proxy returns 403 |
-| Read proxy's environment variables | Impossible (separate pod, separate filesystem) |
+| Read proxy's environment variables | Blocked by pod-level process isolation |
 
 ## Can the agent reach the proxy's credentials via `/proc`?
 
@@ -133,6 +137,25 @@ credential selection (via mTLS client identity) could reduce this,
 but it would trade simplicity and isolation for resource
 efficiency.
 
+## How is the MITM CA private key protected?
+
+The operator generates a P-256 ECDSA CA certificate and private
+key on first reconciliation and stores both in a Kubernetes Secret
+(`{instance}-proxy-ca`). The key material is then mounted
+selectively:
+
+- **Proxy pod:** mounts the full Secret (both `ca.crt` and
+  `ca.key`) because it needs the private key to generate leaf
+  certificates for TLS interception.
+- **Gateway pod:** mounts only `ca.crt` (via the Secret's `items`
+  selector) so the Node.js process trusts the proxy's
+  certificates. The private key is never exposed to the gateway.
+
+The CA Secret is operator-managed (carries the instance label),
+so the operator's informer cache retains its `.Data`. User-owned
+Secrets have their `.Data` stripped from the cache as an
+additional precaution.
+
 ## Does the proxy require special privileges?
 
 No. Both the proxy and gateway pods run under the **Kubernetes
@@ -143,19 +166,19 @@ pods.
 The proxy pod's security profile:
 
 ```yaml
-automountServiceAccountToken: false   # no K8s API access
+automountServiceAccountToken: false # no K8s API access
 securityContext:
   seccompProfile:
-    type: RuntimeDefault              # syscall filtering
+    type: RuntimeDefault # syscall filtering
 containers:
   - securityContext:
       runAsNonRoot: true
       allowPrivilegeEscalation: false
       readOnlyRootFilesystem: true
       capabilities:
-        drop: [ALL]                   # zero Linux capabilities
+        drop: [ALL] # zero Linux capabilities
     ports:
-      - containerPort: 8080           # unprivileged (>1024)
+      - containerPort: 8080 # unprivileged (>1024)
 ```
 
 The MITM interception works entirely at the application layer: the
