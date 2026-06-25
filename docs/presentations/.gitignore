@@ -1,0 +1,7 @@
+# Marp rendered output — regenerate locally with:
+#   marp --theme-set redhat-dark.css --html claws-as-code.md
+*.html
+*.pdf
+*.pptx
+*.png
+*.jpg
