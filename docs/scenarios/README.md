@@ -16,6 +16,7 @@ Each builds on concepts from the previous one.
 | Per-department profiles | B | IT admin deploying tailored assistants per department |
 | Autonomous agent | E | Unattended agent processing tasks from a queue |
 | [Locked-down kiosk](scenario-f-kiosk-guardrails.md) | F | Regulated environments with strict guardrails |
+| [GitHub-aware assistant](github-api-assistant.md) | — | Non-LLM API access via proxy credential injection |
 
 Scenarios B and E are documented in
 [enterprise onboarding workflows](../enterprise-onboarding-workflows.md)
