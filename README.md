@@ -69,6 +69,7 @@ Step-by-step scenario walkthroughs — start here.
 | [Your first AI assistant](docs/scenarios/scenario-a-shared-team.md) | Personal instance (D), then a shared team setup (A) |
 | [Registry lockdown](docs/scenarios/scenario-c-registry-lockdown.md) | Block public registries, use internal mirrors |
 | [Locked-down kiosk](docs/scenarios/scenario-f-kiosk-guardrails.md) | Regulated environment with strict guardrails |
+| [GitHub-aware assistant](docs/scenarios/github-api-assistant.md) | Non-LLM API access via proxy credential injection |
 
 Per-department profiles (Scenario B) and autonomous agent
 (Scenario E) walkthroughs are planned. See
