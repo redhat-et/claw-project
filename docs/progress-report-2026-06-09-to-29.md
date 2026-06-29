@@ -20,23 +20,30 @@
 
 ## 1. CRD extensions
 
-We added ten new fields to the Claw CRD. These extend the
-upstream spec without breaking backward compatibility — all
-additions are optional, and existing manifests continue to
-work unchanged.
+These extend the upstream spec without breaking backward
+compatibility — all additions are optional, and existing
+manifests continue to work unchanged. The 26-commit diff
+(+7,400 / -2,700 lines across 57 files) breaks down into
+the following groups.
+
+### Entirely new CRD fields (not in upstream)
 
 | CRD field | Purpose | PR |
 | --------- | ------- | -- |
 | `spec.version` | Pin the OpenClaw image tag per instance (e.g., `"2026.6.8"`) | [#1][op1] |
-| `spec.network.builtinPassthroughs` | Allowlist which builtin proxy domains are reachable; omitted builtins are blocked | [#5][op5] |
+| `spec.agentFiles` | Seed workspace files from a Git repo or ConfigMap archive, with apply policy and read-only mounts | [#4][op4], [#8][op8], [#16][op16] |
 | `spec.config.management: user` | User-managed mode — operator seeds config once, then preserves runtime edits | [#4][op4] |
-| `spec.agentFiles.git.secretRef` | Credentials for cloning agent files from private Git repos | [#8][op8] |
-| `spec.restrictions.personaRef` | *(deprecated)* Mount persona files read-only; superseded by `agentFiles.readOnly` | [#7][op7] |
-| `spec.agentFiles.readOnly` | Filesystem-enforced read-only protection for specific workspace files | [#16][op16] |
-| `spec.skills` (restructured) | Three-channel skill delivery: inline content, OCI images, ConfigMap refs | [#18][op18] |
-| `spec.skills.images[].imagePullSecrets` | Pull OCI skill images from private registries | [#28][op28] |
+| `spec.restrictions` | Runtime restriction controls (persona guard, plugin lockdown) | [#7][op7] |
 | `spec.serviceAccountName` | Assign a Kubernetes ServiceAccount to the gateway pod | commit `9ef4e22` |
-| Status: `PluginCompatibility`, `VersionDowngrade`, `InitContainerFailure` conditions | Surface operational warnings in status conditions | commit `36ebd63` |
+| `status.lastDeployedVersion` | Track last deployed version; detect downgrades | commit `36ebd63` |
+| Status conditions: `PluginCompatibility`, `VersionDowngrade`, `InitContainerFailure` | Surface operational warnings | commit `36ebd63` |
+
+### Modified upstream CRD fields
+
+| CRD field | Upstream has | We changed | PR |
+| --------- | ----------- | ---------- | -- |
+| `spec.network` | `inClusterBypass`, `additionalEgress` | Added `builtinPassthroughs` — allowlist which builtin proxy domains are reachable | [#5][op5] |
+| `spec.skills` | `map[string]string` (inline only) | Restructured to `SkillsSpec` with three channels: inline content, OCI images, ConfigMap refs; added `imagePullSecrets` | [#18][op18], [#28][op28] |
 
 [op1]: https://github.com/redhat-et/claw-operator/pull/1
 [op4]: https://github.com/redhat-et/claw-operator/pull/4
