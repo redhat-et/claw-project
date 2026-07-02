@@ -107,16 +107,14 @@ oc create secret generic github-pat \
   -n <your-namespace>
 ```
 
-> **Production alternatives:** For production deployments,
-> consider [Sealed Secrets][sealed] or
-> [HashiCorp Vault][vault] with the
-> [External Secrets Operator][eso] to avoid storing PAT values
-> in plain text. For this walkthrough, a manually created
-> secret is sufficient.
+> **Production alternatives:** For GitOps-safe credential
+> storage, see the [Sealed Secrets guide](../sealed-secrets.md)
+> — encrypt the secret locally and commit it alongside your
+> Claw manifest. For enterprise environments needing automatic
+> rotation, see the [External Secrets Operator][eso-issue]
+> integration (Vault, AWS Secrets Manager, Azure Key Vault).
 
-[sealed]: https://github.com/bitnami-labs/sealed-secrets
-[vault]: https://www.vaultproject.io/
-[eso]: https://external-secrets.io/
+[eso-issue]: https://github.com/redhat-et/claw-project/issues/45
 
 ## Configure the Claw CR
 
