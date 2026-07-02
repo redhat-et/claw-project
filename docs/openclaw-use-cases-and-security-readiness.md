@@ -10,14 +10,16 @@ This distinction matters for enterprise adoption. The same capabilities that mak
 
 Most enterprise work is not a series of single isolated tasks. It is a stream of recurring operational responsibilities:
 
-- Overnight alert watch and escalation
-- Morning briefings and standup prep
-- Triaging and routing incoming issues
-- Chasing stale PRs and tickets
-- Watching repositories and cluster events
-- Keeping docs and runbooks current
-- Tracking action items across meetings
-- Tracking upstream releases and CVEs
+- Watching customer, market, or operational signals and escalating meaningful changes
+- Tracking campaign calendars, content deadlines, approvals, and performance follow-ups
+- Monitoring budget variance, invoices, renewals, purchase requests, and forecast changes
+- Preparing recurring executive, manager, sales, or project briefings from scattered source material
+- Following up on meeting action items, blockers, owners, and unresolved decisions
+- Walking new hires, customers, or internal teams through multi-step onboarding processes
+- Routing incoming requests, tickets, leads, issues, or approvals to the right owner
+- Maintaining continuity across projects by remembering prior decisions, risks, dependencies, and handoffs
+- Watching policy, compliance, vendor, release, or security changes that may require action
+- Producing recurring status updates, summaries, reports, and exception alerts without rebuilding context each time
 
 These workflows are persistent, event-driven, and spread across multiple systems. The value of OpenClaw is not that an agent can answer a question or generate code. The value is that an agent can be assigned a durable responsibility, with identity, tools, memory, policies, and operational boundaries.
 
@@ -49,7 +51,7 @@ The use cases below are early concepts, but they are concrete ones: each has bee
 
 **Profiles: `shared-team`, `project-assistant`, `standard-user`**
 
-The `shared-team` profile is a general software development team assistant: a team of five to ten developers shares one instance with shared credentials and a default persona (one Claw CR, one Secret). It owns project continuity: repo monitoring, PR briefs, CI failure triage, release notes, architecture memory, and safe cluster checks. The `project-assistant` profile adds cross-repo project planning with GitHub API access, where the proxy injects the GitHub credential so the agent itself never holds a token. The `standard-user` profile is the per-developer variant for restricted-network environments, with per-user API keys for cost attribution.
+The `shared-team` profile is a general software development team assistant: a team of five to ten developers shares one instance with shared credentials and a default persona (one Claw CR, one Secret). It owns project continuity: repo monitoring, PR briefs, CI failure triage, release notes, architecture memory, and safe cluster checks. The shared-instance pattern is intentionally bounded to low-risk, read-mostly team workflows (stages 1 and 2 on the adoption ladder below); identity and attribution are at team granularity. When per-user identity, auditability, or cost attribution matters, the per-user pattern applies instead. The `project-assistant` profile adds cross-repo project planning with GitHub API access, where the proxy injects the GitHub credential so the agent itself never holds a token. The `standard-user` profile is the per-developer variant for restricted-network environments, with per-user API keys for cost attribution.
 
 Why a persistent agent: the state of a project (open threads, recent failures, in-flight decisions) changes continuously and lives across GitHub, CI, clusters, and chat. A session-based tool reassembles that context on every invocation; a persistent agent already has it.
 
@@ -83,18 +85,16 @@ Two personas from our roadmap do not yet have profiles and are natural next addi
 
 ## Deployment Scenarios
 
-The [claw-project](https://github.com/redhat-et/claw-project/issues) tracker sketches six deployment scenarios that pair these profiles with operational patterns. Like the profiles, these are design targets rather than proven deployments; they map out the shapes we believe enterprise adoption will take:
+The [claw-project](https://github.com/redhat-et/claw-project/issues) tracker sketches six deployment scenarios that pair these profiles with operational patterns. Like the profiles, these are design targets rather than proven deployments; they map out the shapes we believe enterprise adoption will take. They are ordered here from the most user flexibility to the most platform enforcement (the letters are identifiers from the tracker, not an ordering):
 
 | Scenario | Pattern |
 |---|---|
+| D | Power user: operator provides infrastructure and the credential boundary only; user configures everything else |
 | A | Shared team assistant: one CR, one Secret, 5 to 10 developers |
 | B | Per-department assistants: curated profiles deployed from Git via ArgoCD |
 | C | Locked-down enterprise: public registries blocked, internal mirrors, per-user keys for cost attribution |
-| D | Power user: operator provides infrastructure and the credential boundary only; user configures everything else |
 | E | Autonomous agent: no human user, pinned config re-seeded on every restart, programmatic access, task queue via MCP |
 | F | Locked-down kiosk: five hard enforcement layers (network, config, persona, skills, plugins) for regulated environments such as finance, healthcare, and legal |
-
-Scenario A is the natural entry point for a team; Scenario F is designed to show that the same platform pattern can extend to the most restrictive compliance environments.
 
 ## Why OpenClaw as the Reference Harness?
 
@@ -108,7 +108,9 @@ OpenClaw should be treated as the reference harness for this pattern. The goal i
 
 OpenShift provides the governance layer: workload isolation, service accounts, RBAC, secrets management, network policy, observability, image scanning, and lifecycle controls. OpenClaw provides the agent behavior being governed by those controls.
 
-In practice, the deployed pattern looks like this. Each instance runs in its own namespace. The OpenClaw gateway pod runs the agent and never sees an API key; it runs under the restricted SCC (non-root, SELinux confinement, seccomp filtering, all Linux capabilities dropped) with no service account token mounted. NetworkPolicy blocks all direct egress from the agent pod and restricts ingress to the OpenShift router. The only route out is a credential proxy, which injects secrets into outbound requests at the network boundary and rejects any domain that is not explicitly allowlisted, over HTTPS only. Credentials live in user-managed Kubernetes Secrets, compatible with Vault and External Secrets Operator. The endpoints the agent can reach (LLM APIs, the Kubernetes API server, declared tools) are the endpoints the deployment declares, and nothing else.
+In practice, the deployed pattern looks like this. Each instance runs in its own namespace. The OpenClaw gateway pod runs the agent and never sees an API key; it runs under the restricted SCC (non-root, SELinux confinement, seccomp filtering, all Linux capabilities dropped) with no service account token mounted by default. NetworkPolicy blocks all direct egress from the agent pod and restricts ingress to the OpenShift router. The only route out is a credential proxy, which injects secrets into outbound requests at the network boundary and rejects any domain that is not explicitly allowlisted, over HTTPS only. The proxy is general-purpose, not LLM-specific: it supports seven injection types (`apiKey`, `bearer`, `gcp`, `pathToken`, `oauth2`, `kubernetes`, `none`), covering LLM providers, GitHub, Telegram, enterprise SSO APIs, Kubernetes API servers, and allowlist-only passthrough; see the [proxy security FAQ](proxy-security-faq.md#can-the-proxy-be-used-for-non-llm-credentials). Credentials live in user-managed Kubernetes Secrets, compatible with Vault and External Secrets Operator. The endpoints the agent can reach (LLM APIs, the Kubernetes API server, declared tools) are the endpoints the deployment declares, and nothing else.
+
+Not mounting a service account token by default means the agent has no implicit cluster identity. When a use case needs the Kubernetes API, access is granted one of two explicit ways. The first is proxied: a `kubernetes`-type credential (a standard kubeconfig stored in a Secret) whose token the proxy injects at the boundary while stripping anything the agent presents; the RBAC scope of that token is decided by whoever provisions it (least privilege, typically namespace-scoped), and rotating it is a Secret update. The second is direct: `spec.serviceAccountName` opts the gateway pod into a named ServiceAccount, whose token is then mounted and whose permissions are exactly the RBAC granted to that account, with token rotation handled by Kubernetes. In both paths the grant is declared in the Claw resource, so cluster access is always explicit and reviewable, never ambient.
 
 Everything that confines the agent to the proxy is stock OpenShift. The claw-operator is the reference implementation that stamps this pattern out per instance: it makes deployment and scale easy, but the enforcement comes from the platform.
 
@@ -142,7 +144,7 @@ Every capability pairs its value with a named mechanism, most of them stock Open
 
 ## Use Case Security Matrix
 
-The supporting spreadsheet converts this narrative into an enterprise review artifact. Each row describes a real use case and maps it to permissions, concerns, mitigations, residual risk, and maturity, so that every workflow becomes reviewable before it runs.
+The supporting spreadsheet converts this narrative into an enterprise review artifact. Each row describes a real use case and maps it to permissions, concerns, mitigations, residual risk, and maturity, so that every workflow becomes reviewable before it runs. For questions about the credential boundary itself, see the [proxy security FAQ](proxy-security-faq.md).
 
 | Column | Purpose |
 |---|---|
