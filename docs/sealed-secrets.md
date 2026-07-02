@@ -52,7 +52,7 @@ These steps are performed once per cluster.
 ### Install the Sealed Secrets controller
 
 ```bash
-oc apply -f https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.28.0/controller.yaml
+oc apply -f https://github.com/bitnami/sealed-secrets/releases/download/v0.38.1/controller.yaml
 ```
 
 Verify the controller is running:
@@ -72,8 +72,8 @@ brew install kubeseal
 On Linux (amd64):
 
 ```bash
-KUBESEAL_VERSION=0.28.0
-curl -OL "https://github.com/bitnami-labs/sealed-secrets/releases/download/v${KUBESEAL_VERSION}/kubeseal-${KUBESEAL_VERSION}-linux-amd64.tar.gz"
+KUBESEAL_VERSION=0.38.1
+curl -OL "https://github.com/bitnami/sealed-secrets/releases/download/v${KUBESEAL_VERSION}/kubeseal-${KUBESEAL_VERSION}-linux-amd64.tar.gz"
 tar -xzf "kubeseal-${KUBESEAL_VERSION}-linux-amd64.tar.gz" kubeseal
 sudo install -m 755 kubeseal /usr/local/bin/kubeseal
 ```
@@ -291,5 +291,5 @@ encrypt it separately for each namespace.
   the [GitOps setup](gitops-setup.md) to onboard departments
   with fully declarative, Git-managed deployments
 
-[sealed]: https://github.com/bitnami-labs/sealed-secrets
+[sealed]: https://github.com/bitnami/sealed-secrets
 [eso-issue]: https://github.com/redhat-et/claw-project/issues/45
