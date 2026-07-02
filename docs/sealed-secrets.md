@@ -51,9 +51,15 @@ These steps are performed once per cluster.
 
 ### Install the Sealed Secrets controller
 
+> Check the [releases page][releases] for the latest version
+> before installing. The commands below use v0.38.1, which was
+> current at the time of writing.
+
 ```bash
 oc apply -f https://github.com/bitnami/sealed-secrets/releases/download/v0.38.1/controller.yaml
 ```
+
+[releases]: https://github.com/bitnami/sealed-secrets/releases
 
 Verify the controller is running:
 
