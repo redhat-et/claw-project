@@ -215,6 +215,19 @@ git pull
 oc apply -f .
 ```
 
+Alternatively, apply directly from a GitHub raw URL without
+cloning:
+
+```bash
+oc new-project ai-planning
+oc apply -f https://raw.githubusercontent.com/your-org/your-claw-deployment/main/anthropic-key-sealed.yaml
+oc apply -f https://raw.githubusercontent.com/your-org/your-claw-deployment/main/claw.yaml
+```
+
+This is useful for quick demos or when sharing a deployment
+with a colleague — one command per file, no local checkout
+needed.
+
 ### Option B: Argo CD GitOps
 
 If your cluster runs Argo CD (see
