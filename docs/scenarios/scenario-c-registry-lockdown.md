@@ -159,11 +159,11 @@ oc apply -f jane-doe.yaml
 
 Repeat for each developer — one Secret and one CR per person.
 
-### GitOps via ArgoCD
+### GitOps via Argo CD
 
 For teams with many developers, GitOps is more practical than
 manual `oc apply` for each user. See
-[GitOps setup](../gitops-setup.md) for the full ArgoCD
+[GitOps setup](../gitops-setup.md) for the full Argo CD
 configuration.
 
 Each developer creates a manifest in their directory:
@@ -174,7 +174,7 @@ cp manifests/scenarios/scenario-c-registry-lockdown.yaml \
 ```
 
 Edit the manifest to use their own secret name, push, and
-ArgoCD handles the rest. The admin creates the per-user API
+Argo CD handles the rest. The admin creates the per-user API
 key secret in the matching namespace (`ai-users` for manual
 deploys, `<username>-claw` for GitOps).
 
@@ -231,7 +231,7 @@ For organizations with dozens of developers, automate the
 per-user provisioning:
 
 1. **GitOps** — each developer maintains their own manifest
-   in `manifests/<username>/`. ArgoCD syncs automatically.
+   in `manifests/<username>/`. Argo CD syncs automatically.
 2. **Shared network policy** — the `builtinPassthroughs` and
    `type: none` credential blocks are identical across all
    users. Use a base manifest that developers copy.

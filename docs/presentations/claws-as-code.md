@@ -194,7 +194,7 @@ Timing: ~45s
 
 1. **Author** persona Markdown + Claw CR in Git
 2. **Review** persona changes in a PR — just like code
-3. **Merge** → ArgoCD syncs to cluster
+3. **Merge** → Argo CD syncs to cluster
 4. **Deploy** → operator reconciles, pod starts with persona
 
 Audit trail built in. Rollback is `git revert`.
@@ -211,7 +211,7 @@ Timing: ~45s
 
 - Multi-instance deployment with **credential isolation**
 - **Six scenarios** — personal dev to regulated kiosk
-- **GitOps** with ArgoCD
+- **GitOps** with Argo CD
 - Enterprise persona profiles (finance, HR, marketing, dev)
 - **MCP server** integration
 - Idle management, version pinning, **collections repo**

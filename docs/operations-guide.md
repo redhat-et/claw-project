@@ -34,9 +34,21 @@ spend using gateway-level metrics and Kubernetes labels.
 
 ## Secret management patterns
 
-*Planned.* Integration patterns for ExternalSecrets and
-SealedSecrets to manage API keys and credentials across
-multi-user deployments.
+Store credentials in Git safely using Sealed Secrets, or
+integrate with an enterprise vault using the External Secrets
+Operator. Both patterns produce regular Kubernetes Secrets
+that the Claw operator reads via `spec.credentials[].secretRef`.
+
+| Pattern | Complexity | Rotation | Best for |
+| ------- | ---------- | -------- | -------- |
+| Sealed Secrets | Low | Manual (re-encrypt and commit) | Teams starting with GitOps |
+| ESO + Vault | High | Automatic (`refreshInterval`) | Enterprise compliance requirements |
+
+See [Sealed Secrets guide](sealed-secrets.md) for the full
+walkthrough. ESO + Vault integration is tracked in
+[#45][eso-issue].
+
+[eso-issue]: https://github.com/redhat-et/claw-project/issues/45
 
 ## Upgrade procedures
 

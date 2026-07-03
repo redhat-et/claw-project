@@ -85,7 +85,8 @@ index.
 | ----- | ------ |
 | [GitOps deployment with Argo CD](docs/gitops-setup.md) | Available |
 | [Git-based change tracking](docs/git-change-tracking.md) | Available |
-| [Cost attribution](docs/operations-guide.md#cost-attribution-strategies), [secret management](docs/operations-guide.md#secret-management-patterns), [upgrades](docs/operations-guide.md#upgrade-procedures), [monitoring](docs/operations-guide.md#monitoring-and-observability) | Planned |
+| [Sealed Secrets for credentials](docs/sealed-secrets.md) | Available |
+| [Cost attribution](docs/operations-guide.md#cost-attribution-strategies), [upgrades](docs/operations-guide.md#upgrade-procedures), [monitoring](docs/operations-guide.md#monitoring-and-observability) | Planned |
 
 ### Reference
 

@@ -60,6 +60,6 @@ for working wiring.
 For deploying collections at scale via GitOps, see:
 
 - [Enterprise Onboarding Workflows](enterprise-onboarding-workflows.md)
-  — Scenario B shows per-department collections deployed via ArgoCD
+  — Scenario B shows per-department collections deployed via Argo CD
 - [Enterprise Deployment Design](dev/enterprise-deployment-design.md)
   — OCI-based skill delivery for supply chain integrity

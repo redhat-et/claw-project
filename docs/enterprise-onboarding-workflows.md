@@ -85,7 +85,7 @@ corp-claw-configs/
         └── AGENTS.md
 ```
 
-**Claw CRs** (one per department, deployed via ArgoCD):
+**Claw CRs** (one per department, deployed via Argo CD):
 
 ```yaml
 apiVersion: claw.sandbox.redhat.com/v1alpha1
@@ -112,7 +112,7 @@ spec:
 
 **What happens:**
 
-1. ArgoCD syncs the Claw CR to the cluster
+1. Argo CD syncs the Claw CR to the cluster
 2. Operator reconciles: creates pod with init-config
 3. init-config clones `hr/` from the Git repo (via proxy)
 4. `workspace-main/` is seeded into the workspace — the
@@ -396,7 +396,7 @@ Features that already work but may need documentation:
 
 | Feature            | Notes                                                  |
 | ------------------ | ------------------------------------------------------ |
-| ArgoCD deployment  | Standard GitOps — Claw CR is just a K8s resource       |
+| Argo CD deployment  | Standard GitOps — Claw CR is just a K8s resource       |
 | Shared credentials | Multiple CRs reference same Secret                     |
 | Idle management    | `spec.idle: true` for unused instances                 |
 | Version pinning    | `spec.version` per instance                            |
@@ -423,10 +423,10 @@ All scenarios follow the same pattern:
        └── credentials.yaml
 ```
 
-2. ArgoCD Application points at `manifests/`
+2. Argo CD Application points at `manifests/`
 
 3. On push:
-   ArgoCD syncs CRs → operator reconciles → pods start →
+   Argo CD syncs CRs → operator reconciles → pods start →
    init-config seeds from `configs/` → users get URLs
 
 4. To update a department profile:
@@ -452,7 +452,7 @@ All scenarios follow the same pattern:
 
 4. **Approval workflow:** Should there be a review process for
    config changes before they reach production instances?
-   ArgoCD provides this naturally via PR-based GitOps.
+   Argo CD provides this naturally via PR-based GitOps.
 
 5. **Agent self-modification:** The agent is the most capable
    user in the container. A user can ask the agent to edit its
