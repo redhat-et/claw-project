@@ -16,13 +16,13 @@ of Git.
 
 Sealed Secrets closes the gap: the admin encrypts a secret
 locally, commits the encrypted SealedSecret to Git alongside
-the Claw manifest, and ArgoCD syncs both. No manual step on
+the Claw manifest, and Argo CD syncs both. No manual step on
 the cluster.
 
 ```text
 Local                          Git                 Cluster
 ──────                         ───                 ───────
-Secret ──kubeseal──► SealedSecret ──ArgoCD──► SealedSecret
+Secret ──kubeseal──► SealedSecret ──Argo CD──► SealedSecret
                                                     │
                                               controller
                                                     │
@@ -39,7 +39,7 @@ Secret ──kubeseal──► SealedSecret ──ArgoCD──► SealedSecret
 ## Prerequisites
 
 - OpenShift cluster with the Claw operator installed
-- [GitOps setup](gitops-setup.md) completed (ArgoCD +
+- [GitOps setup](gitops-setup.md) completed (Argo CD +
   ApplicationSet)
 - `oc` CLI authenticated as a cluster admin (for controller
   installation) or namespace admin (for creating
@@ -177,10 +177,50 @@ rm sa-key.json
 > fields. The SealedSecret will be correspondingly larger,
 > but this has no effect on functionality.
 
-## Commit alongside the Claw manifest
+## Deploy
 
-The encrypted SealedSecrets live in the same directory as
-the Claw manifests. ArgoCD syncs both:
+Store the encrypted SealedSecrets in Git alongside the Claw
+manifests:
+
+```text
+my-claw-deployment/
+  claw.yaml                      # Claw CR
+  anthropic-key-sealed.yaml      # SealedSecret
+  github-pat-sealed.yaml         # SealedSecret (optional)
+```
+
+### Option A: direct apply from Git
+
+The simplest approach — clone the repo and apply everything
+with `oc apply`. No Argo CD required.
+
+```bash
+git clone git@github.com:your-org/your-claw-deployment.git
+cd your-claw-deployment
+
+oc new-project ai-planning
+oc apply -f .
+```
+
+The Sealed Secrets controller decrypts each SealedSecret
+into a regular Secret. The Claw operator reads the Secrets
+via `secretRef` and starts the instance. The entire
+deployment is reproducible from a single `git clone` and
+`oc apply`.
+
+To update credentials or configuration, edit and re-apply:
+
+```bash
+git pull
+oc apply -f .
+```
+
+### Option B: Argo CD GitOps
+
+If your cluster runs Argo CD (see
+[GitOps setup](gitops-setup.md)), push the SealedSecrets
+to the claw-collections repository alongside the Claw
+manifests:
 
 ```text
 manifests/
@@ -190,8 +230,6 @@ manifests/
     github-pat-sealed.yaml         # SealedSecret
 ```
 
-Push to Git:
-
 ```bash
 cd claw-collections
 git add manifests/panni/
@@ -199,14 +237,14 @@ git commit -m "Add assistant with sealed credentials"
 git push origin main
 ```
 
-ArgoCD syncs the SealedSecrets to the cluster. The Sealed
-Secrets controller decrypts each one into a regular Secret.
-The Claw operator reads the Secrets via `secretRef` — no
-change to the Claw CR is needed.
+Argo CD syncs both the SealedSecrets and the Claw CR
+automatically. The Sealed Secrets controller decrypts each
+one into a regular Secret. No `oc apply` needed after the
+initial Argo CD setup.
 
-## ArgoCD configuration
+#### Argo CD RBAC
 
-ArgoCD needs permission to manage SealedSecret resources.
+Argo CD needs permission to manage SealedSecret resources.
 Add a ClusterRole (similar to the Claw resources role from
 [GitOps setup](gitops-setup.md)):
 
@@ -234,7 +272,7 @@ rules:
 EOF
 ```
 
-Bind it to the ArgoCD application controller:
+Bind it to the Argo CD application controller:
 
 ```bash
 cat <<'EOF' | oc apply -f -
@@ -257,7 +295,8 @@ EOF
 
 ## Verify
 
-After ArgoCD syncs, check that the Secret was created:
+After applying (or after Argo CD syncs), check that the
+Secret was created:
 
 ```bash
 oc get secret anthropic-key -n panni-claw
@@ -280,7 +319,7 @@ a credential:
 1. Generate a new API key from the provider
 1. Re-encrypt the secret with `kubeseal`
 1. Commit and push the updated SealedSecret
-1. ArgoCD syncs the new SealedSecret to the cluster
+1. Argo CD syncs the new SealedSecret to the cluster
 1. The controller updates the underlying Secret
 1. The Claw operator detects the change via the secret
    version annotation and triggers a pod rollout
