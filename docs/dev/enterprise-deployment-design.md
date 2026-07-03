@@ -369,7 +369,7 @@ application-level concern. Options:
 
 | Approach                  | Complexity | Fits when                               |
 | ------------------------- | ---------- | --------------------------------------- |
-| GitOps (ArgoCD/Flux)      | Low        | Users are developers who can submit PRs |
+| GitOps (Argo CD/Flux)      | Low        | Users are developers who can submit PRs |
 | Self-service portal       | Medium     | Business users who need a web UI        |
 | Namespace-per-user + RBAC | Low        | Users create their own CRs with quotas  |
 | Helm chart with values    | Low        | Standardized deployments via CI/CD      |

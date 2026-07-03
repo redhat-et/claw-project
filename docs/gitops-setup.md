@@ -1,11 +1,11 @@
-# GitOps for OpenClaw with ArgoCD
+# GitOps for OpenClaw with Argo CD
 
 Deploy OpenClaw instances by pushing YAML manifests to Git.
-**OpenShift GitOps** (ArgoCD) watches the
+**OpenShift GitOps** (Argo CD) watches the
 [claw-collections][repo] repository and automatically syncs
 Claw resources to the cluster.
 
-Each user gets a subdirectory under `manifests/` — ArgoCD
+Each user gets a subdirectory under `manifests/` — Argo CD
 creates an Application per directory, targeting the matching
 `<username>-claw` namespace. Namespaces are created
 automatically on first sync.
@@ -33,7 +33,7 @@ These steps are performed once by the cluster admin.
 
 Install the **OpenShift GitOps** operator from the OpenShift
 **Software Catalog** (OperatorHub). Accept the defaults — the
-operator creates an ArgoCD instance in the `openshift-gitops`
+operator creates an Argo CD instance in the `openshift-gitops`
 namespace automatically. No extra configuration is needed.
 
 Verify the install:
@@ -42,15 +42,15 @@ Verify the install:
 oc get argocd -n openshift-gitops
 ```
 
-The operator also creates a route for the ArgoCD UI:
+The operator also creates a route for the Argo CD UI:
 
 ```bash
 oc get route -n openshift-gitops
 ```
 
-### Grant ArgoCD access to Claw resources
+### Grant Argo CD access to Claw resources
 
-ArgoCD's controller has read-only access to all API groups by
+Argo CD's controller has read-only access to all API groups by
 default, but needs **write** access for Claw custom resources.
 Create a separate ClusterRole (not editing the operator-managed
 one, which could be reverted on reconcile):
@@ -80,7 +80,7 @@ rules:
 EOF
 ```
 
-Bind it to the ArgoCD application controller:
+Bind it to the Argo CD application controller:
 
 ```bash
 cat <<'EOF' | oc apply -f -
@@ -113,7 +113,7 @@ oc auth can-i create claws.claw.sandbox.redhat.com \
 ### Create the ApplicationSet
 
 The ApplicationSet scans `manifests/` for subdirectories and
-creates one ArgoCD Application per directory. Each directory
+creates one Argo CD Application per directory. Each directory
 name maps to a `<name>-claw` namespace.
 
 ```bash
@@ -153,7 +153,7 @@ EOF
 
 | Sync setting | Value | Effect |
 | ------------ | ----- | ------ |
-| `automated` | enabled | ArgoCD syncs on every detected change |
+| `automated` | enabled | Argo CD syncs on every detected change |
 | `selfHeal` | `true` | Manual cluster edits are reverted to match Git |
 | `prune` | `false` | Removing a manifest from Git does **not** delete the resource |
 | `CreateNamespace` | `true` | Namespace is created automatically on first sync |
@@ -161,7 +161,7 @@ EOF
 ### Onboard a new user
 
 When a new user creates their directory under `manifests/` and
-pushes, ArgoCD auto-creates the namespace and deploys their
+pushes, Argo CD auto-creates the namespace and deploys their
 manifests. The admin then creates the user's LLM provider
 secret(s) in that namespace.
 
@@ -204,7 +204,7 @@ oc create secret generic anthropic-api-key \
 ### Monitor deployments
 
 ```bash
-# List all ArgoCD-generated Applications
+# List all Argo CD-generated Applications
 oc get applications.argoproj.io -n openshift-gitops
 
 # Check a specific user's sync status
@@ -244,7 +244,7 @@ mkdir manifests/<your-username>
 ### Write your Claw manifest
 
 Create a YAML file in your directory. The filename can be
-anything — ArgoCD applies all `.yaml` files it finds.
+anything — Argo CD applies all `.yaml` files it finds.
 
 #### Claude via Vertex AI
 
@@ -324,7 +324,7 @@ git commit -m "Add Claw manifests for <your-username>"
 git push origin main
 ```
 
-ArgoCD polls the repo every 3 minutes. Your namespace and Claw
+Argo CD polls the repo every 3 minutes. Your namespace and Claw
 resources will appear within **about 5 minutes**. Check status:
 
 ```bash
@@ -336,28 +336,28 @@ verify your provider secret is in place.
 
 ### Update or add instances
 
-Edit your manifests or add new YAML files and push. ArgoCD
+Edit your manifests or add new YAML files and push. Argo CD
 picks up changes automatically — no need to run `oc apply`.
 
 > [!IMPORTANT]
 > Do **not** change `metadata.name` of an existing manifest.
-> ArgoCD treats it as a new resource and leaves the old one
+> Argo CD treats it as a new resource and leaves the old one
 > running. If you need to rename, delete the old Claw first:
 > `oc delete claw <old-name> -n <your-username>-claw`
 
 ---
 
-## How ArgoCD sync works
+## How Argo CD sync works
 
 ### Self-healing
 
 If someone manually deletes a Claw resource from the cluster,
-ArgoCD detects the drift and restores it within about one
+Argo CD detects the drift and restores it within about one
 minute. Git is the source of truth.
 
 ### Sync timing
 
-ArgoCD polls the Git repo periodically. In practice, changes
+Argo CD polls the Git repo periodically. In practice, changes
 take **up to 5 minutes** to appear on the cluster. Faster
 sync is possible with a [GitHub webhook][webhook].
 
@@ -365,12 +365,12 @@ sync is possible with a [GitHub webhook][webhook].
 
 We use `prune: false` for safety. If you remove a YAML file
 from Git, the Claw resource stays running on the cluster —
-it becomes an orphan that ArgoCD no longer tracks. Delete
+it becomes an orphan that Argo CD no longer tracks. Delete
 orphans manually with `oc delete claw`.
 
 ### Resource tracking
 
-ArgoCD annotates every resource it manages with a tracking ID.
+Argo CD annotates every resource it manages with a tracking ID.
 You can inspect it to trace a Claw resource back to its Git
 source:
 
@@ -394,7 +394,7 @@ oc get applications.argoproj.io claw-panni -n openshift-gitops \
   -o jsonpath='Repo:   {.spec.source.repoURL}{"\n"}Path:   {.spec.source.path}{"\n"}Commit: {.status.sync.revision}{"\n"}'
 ```
 
-ArgoCD tracks at the **directory** level, not per file. To
+Argo CD tracks at the **directory** level, not per file. To
 find which file defines a specific resource, grep for the
 resource name in the synced path:
 

@@ -218,7 +218,7 @@ share it through a secure channel.
 ## Deploy via GitOps
 
 Both manifests work with [Red Hat OpenShift GitOps][gitops]
-(ArgoCD). If your cluster has the claw-collections
+(Argo CD). If your cluster has the claw-collections
 ApplicationSet configured (see
 [GitOps setup](../gitops-setup.md)), deploy by pushing the
 manifest to Git instead of running `oc apply`.
@@ -232,7 +232,7 @@ cp manifests/scenarios/scenario-d-power-user.yaml \
    manifests/<your-username>/my-assistant.yaml
 ```
 
-Push to trigger ArgoCD sync:
+Push to trigger Argo CD sync:
 
 ```bash
 git add manifests/<your-username>/my-assistant.yaml
@@ -240,7 +240,7 @@ git commit -m "Add my assistant"
 git push origin main
 ```
 
-ArgoCD creates the `<your-username>-claw` namespace
+Argo CD creates the `<your-username>-claw` namespace
 automatically and syncs the Claw CR. Create the provider
 secret in that namespace:
 

@@ -210,7 +210,7 @@ git commit -m "Add project assistant with GitHub access"
 git push origin main
 ```
 
-ArgoCD syncs the Claw CR automatically. Create the secrets in
+Argo CD syncs the Claw CR automatically. Create the secrets in
 the target namespace — the operator waits gracefully until they
 exist:
 

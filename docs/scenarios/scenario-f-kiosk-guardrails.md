@@ -158,7 +158,7 @@ git commit -m "Add locked-down finance analyst"
 git push origin main
 ```
 
-See [GitOps setup](../gitops-setup.md) for the full ArgoCD
+See [GitOps setup](../gitops-setup.md) for the full Argo CD
 configuration.
 
 ## Verify each defense layer
