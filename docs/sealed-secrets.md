@@ -351,16 +351,29 @@ git commit -m "Rotate Anthropic API key"
 git push origin main
 ```
 
-## Namespace scoping
+## Scope and portability
 
-SealedSecrets are scoped to a **specific namespace and name**
-by default. A SealedSecret encrypted for `panni-claw` cannot
-be decrypted in `dylan-claw` — even if the encrypted YAML is
-copied there. This prevents a user from reusing another
-user's credentials by copying their SealedSecret file.
+SealedSecrets are bound to a **specific namespace, name, and
+cluster** by default.
 
-If you need a secret available in multiple namespaces,
-encrypt it separately for each namespace.
+**Namespace + name binding:** A SealedSecret encrypted for
+`panni-claw/anthropic-key` cannot be decrypted in
+`dylan-claw/anthropic-key` — the controller rejects it
+because the namespace and name are part of the encrypted
+envelope. This prevents a user from reusing another user's
+credentials by copying their SealedSecret file.
+
+**Cluster binding:** Each Sealed Secrets controller generates
+its own RSA key pair on first startup. The public key (what
+`kubeseal --fetch-cert` returns) encrypts; the private key
+(stored in `kube-system`) decrypts. A SealedSecret encrypted
+with one cluster's public key cannot be decrypted by another
+cluster's controller. If you have staging and production
+clusters, you encrypt the same credential separately for
+each cluster — even if the namespace and secret name match.
+
+If you need a secret available in multiple namespaces or
+across clusters, encrypt it separately for each target.
 
 ## Limitations
 
