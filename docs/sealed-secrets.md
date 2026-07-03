@@ -140,6 +140,43 @@ oc create secret generic github-pat \
   > manifests/panni/github-pat-sealed.yaml
 ```
 
+### Vertex AI service account key
+
+Vertex AI uses a JSON key file instead of a simple string
+token. Create the service account and download the key first:
+
+```bash
+gcloud iam service-accounts create claw-vertex \
+  --display-name="Claw Vertex AI"
+gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
+  --member="serviceAccount:claw-vertex@YOUR_PROJECT_ID.iam.gserviceaccount.com" \
+  --role="roles/aiplatform.user"
+gcloud iam service-accounts keys create sa-key.json \
+  --iam-account=claw-vertex@YOUR_PROJECT_ID.iam.gserviceaccount.com
+```
+
+Then encrypt the key file as a SealedSecret:
+
+```bash
+oc create secret generic vertex-sa-key \
+  --from-file=sa-key.json=sa-key.json \
+  --namespace=panni-claw \
+  --dry-run=client -o yaml \
+  | kubeseal --format yaml \
+  > manifests/panni/vertex-sa-key-sealed.yaml
+```
+
+Delete the plaintext key file from your local machine:
+
+```bash
+rm sa-key.json
+```
+
+> **Note:** `--from-file` produces a larger Secret than
+> `--from-literal` because the JSON key contains multiple
+> fields. The SealedSecret will be correspondingly larger,
+> but this has no effect on functionality.
+
 ## Commit alongside the Claw manifest
 
 The encrypted SealedSecrets live in the same directory as
