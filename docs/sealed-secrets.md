@@ -39,11 +39,11 @@ Secret ──kubeseal──► SealedSecret ──Argo CD──► SealedSecret
 ## Prerequisites
 
 - OpenShift cluster with the Claw operator installed
-- [GitOps setup](gitops-setup.md) completed (Argo CD +
-  ApplicationSet)
 - `oc` CLI authenticated as a cluster admin (for controller
   installation) or namespace admin (for creating
   SealedSecrets)
+- For Argo CD deployment (Option B only):
+  [GitOps setup](gitops-setup.md) completed
 
 ## Cluster admin setup
 
@@ -95,6 +95,12 @@ fails, check that your `oc` context points to the right
 cluster.
 
 ## Encrypt a credential
+
+> **Important:** The `--namespace` value you use during
+> encryption must match the namespace where you will deploy.
+> A SealedSecret encrypted for `panni-claw` cannot be
+> decrypted in a different namespace. The examples below use
+> `panni-claw`; substitute your target namespace.
 
 ### LLM provider key
 
@@ -198,7 +204,7 @@ with `oc apply`. No Argo CD required.
 git clone git@github.com:your-org/your-claw-deployment.git
 cd your-claw-deployment
 
-oc new-project ai-planning
+oc new-project panni-claw
 oc apply -f .
 ```
 
@@ -334,8 +340,8 @@ a credential:
 1. Commit and push the updated SealedSecret
 1. Argo CD syncs the new SealedSecret to the cluster
 1. The controller updates the underlying Secret
-1. The Claw operator detects the change via the secret
-   version annotation and triggers a pod rollout
+1. The Claw operator detects the Secret change and rolls
+   out the affected pod
 
 ```bash
 oc create secret generic anthropic-key \
