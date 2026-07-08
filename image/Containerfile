@@ -20,7 +20,7 @@ USER 0
 # Edit this list to add tools available in Debian Bookworm repos.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-    jq \
+    jq unzip \
     && rm -rf /var/lib/apt/lists/*
 
 # ── Static binaries (not in Debian repos) ─────
@@ -33,6 +33,16 @@ RUN curl -fsSL \
     -o /usr/local/bin/yq \
     && echo "${YQ_SHA256}  /usr/local/bin/yq" | sha256sum -c - \
     && chmod +x /usr/local/bin/yq
+
+ARG RCLONE_VERSION=v1.74.4
+ARG RCLONE_SHA256=fe435e0c36228e7c2f116a8701f01127bb1f694005fc11d1f27186c8bca4115d
+RUN curl -fsSL \
+    "https://downloads.rclone.org/${RCLONE_VERSION}/rclone-${RCLONE_VERSION}-linux-${TARGETARCH}.zip" \
+    -o /tmp/rclone.zip \
+    && echo "${RCLONE_SHA256}  /tmp/rclone.zip" | sha256sum -c - \
+    && unzip -j /tmp/rclone.zip "*/rclone" -d /usr/local/bin/ \
+    && chmod +x /usr/local/bin/rclone \
+    && rm /tmp/rclone.zip
 
 # ── Restore non-root user ─────────────────────
 # OpenShift overrides this with a namespace-assigned UID,

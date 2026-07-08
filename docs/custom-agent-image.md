@@ -122,6 +122,7 @@ as GitHub Actions secrets.
 | ---- | ------ | ------- |
 | `jq` | Debian apt | JSON parsing and transformation |
 | `yq` | Static binary | YAML parsing (mirrors `jq` for YAML) |
+| `rclone` | Static binary | Backup/restore agent workspaces to S3, GCS, etc. |
 
 Tools already present in the upstream image: `curl`, `git`,
 `python3`, `openssl`, `ca-certificates`, `tini`.
