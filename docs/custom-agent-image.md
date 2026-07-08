@@ -64,7 +64,7 @@ podman build -t openclaw-agent:dev image/
 Verify the tools are available:
 
 ```bash
-podman run --rm openclaw-agent:dev sh -c "jq --version && yq --version"
+podman run --rm openclaw-agent:dev sh -c "jq --version && yq --version && rclone --version"
 ```
 
 To pin to a specific upstream version:
