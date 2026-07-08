@@ -50,6 +50,18 @@ walkthrough. ESO + Vault integration is tracked in
 
 [eso-issue]: https://github.com/redhat-et/claw-project/issues/45
 
+## Custom agent image
+
+The upstream OpenClaw container lacks CLI tools like `jq` and
+`yq` that agents need for data processing. A thin overlay
+image adds these tools without forking the upstream image.
+A GitHub Actions workflow rebuilds automatically on tool list
+changes, manual dispatch, and a weekly schedule that tracks
+upstream releases.
+
+See [Custom agent image](custom-agent-image.md) for the full
+guide.
+
 ## Upgrade procedures
 
 *Planned.* Rolling upgrade strategies for the OpenClaw operator
