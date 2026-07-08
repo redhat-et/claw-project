@@ -55,9 +55,9 @@ walkthrough. ESO + Vault integration is tracked in
 The upstream OpenClaw container lacks CLI tools like `jq` and
 `yq` that agents need for data processing. A thin overlay
 image adds these tools without forking the upstream image.
-A GitHub Action rebuilds automatically on tool list changes,
-manual dispatch, and a weekly schedule that tracks upstream
-releases.
+A GitHub Actions workflow rebuilds automatically on tool list
+changes, manual dispatch, and a weekly schedule that tracks
+upstream releases.
 
 See [Custom agent image](custom-agent-image.md) for the full
 guide.

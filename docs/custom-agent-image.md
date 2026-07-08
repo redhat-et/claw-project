@@ -12,8 +12,8 @@ additional CLI tools on top of the upstream OpenClaw image.
 ## How it works
 
 A thin `Containerfile` in `image/` extends the upstream image
-with additional packages. A GitHub Action rebuilds and pushes
-the image automatically.
+with additional packages. A GitHub Actions workflow rebuilds
+and pushes the image automatically.
 
 ```text
 ┌─────────────────────────────┐
@@ -32,14 +32,17 @@ Edit `image/Containerfile`:
 - **Apt packages** (available in Debian Bookworm repos) — add
   to the `apt-get install` line
 - **Static binaries** (not in repos) — add a `curl` + `chmod`
-  block, following the `yq` example in the file
+  block, following the `yq` example in the file. Always
+  pin the version and verify the SHA-256 checksum.
 
-Push to `main` and the GitHub Action rebuilds the image.
+Push to `main` and the GitHub Actions workflow rebuilds
+the image.
 
 ## Build triggers
 
-The GitHub Action (`.github/workflows/build-agent-image.yaml`)
-runs on three triggers:
+The GitHub Actions workflow
+(`.github/workflows/build-agent-image.yaml`) runs on three
+triggers:
 
 | Trigger | When | Use case |
 | ------- | ---- | -------- |
@@ -58,6 +61,12 @@ tags the output image accordingly (e.g. `2026.6.11`,
 podman build -t openclaw-agent:dev image/
 ```
 
+Verify the tools are available:
+
+```bash
+podman run --rm openclaw-agent:dev sh -c "jq --version && yq --version"
+```
+
 To pin to a specific upstream version:
 
 ```bash
@@ -71,12 +80,12 @@ podman build \
 Set `spec.image` in the Claw CR to point to your custom image:
 
 ```yaml
-apiVersion: claw.redhat.com/v1alpha1
+apiVersion: claw.sandbox.redhat.com/v1alpha1
 kind: Claw
 metadata:
   name: my-agent
 spec:
-  image: quay.io/redhat-et/openclaw-agent:2026.6.11
+  image: quay.io/<myorg>/openclaw-agent:2026.6.11
   # ... rest of the spec
 ```
 
@@ -90,7 +99,11 @@ spec:
 
 ## CI prerequisites
 
-The GitHub Action requires two repository secrets:
+Before the first build, update `env.IMAGE_NAME` in
+`.github/workflows/build-agent-image.yaml` to match your
+Quay.io organization and repository name.
+
+The workflow requires two repository secrets:
 
 | Secret | Value |
 | ------ | ----- |
@@ -111,7 +124,17 @@ as GitHub Actions secrets.
 | `yq` | Static binary | YAML parsing (mirrors `jq` for YAML) |
 
 Tools already present in the upstream image: `curl`, `git`,
-`python3`, `openssl`, `ca-certificates`.
+`python3`, `openssl`, `ca-certificates`, `tini`.
+
+## Tools evaluated but not included
+
+[Issue #69][issue] lists additional tools that were evaluated
+and deferred:
+
+| Tool | Status | Reason |
+| ---- | ------ | ------ |
+| `rg` (ripgrep) | Deferred | Not yet needed in agent workflows; can be added later |
+| `gh` (GitHub CLI) | Blocked | `gh` authenticates via `GITHUB_TOKEN` or `~/.config/gh/hosts.yml`, neither of which integrates with the Claw proxy's credential injection model. See [#69][issue] for possible workarounds (proxy passthrough, projected Secret, wrapper script). |
 
 ## References
 

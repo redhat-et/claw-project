@@ -8,7 +8,7 @@
 #   podman build -t openclaw-agent:dev image/
 #
 # Pin to a specific upstream release:
-#   podman build --build-arg UPSTREAM=ghcr.io/openclaw/openclaw:0.40.2 \
+#   podman build --build-arg UPSTREAM=ghcr.io/openclaw/openclaw:2026.6.11 \
 #     -t openclaw-agent:dev image/
 
 ARG UPSTREAM=ghcr.io/openclaw/openclaw:latest
@@ -27,9 +27,11 @@ RUN apt-get update \
 ARG TARGETARCH=amd64
 
 ARG YQ_VERSION=v4.53.3
+ARG YQ_SHA256=fa52a4e758c63d38299163fbdd1edfb4c4963247918bf9c1c5d31d84789eded4
 RUN curl -fsSL \
     "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_${TARGETARCH}" \
     -o /usr/local/bin/yq \
+    && echo "${YQ_SHA256}  /usr/local/bin/yq" | sha256sum -c - \
     && chmod +x /usr/local/bin/yq
 
 # ── Restore non-root user ─────────────────────
