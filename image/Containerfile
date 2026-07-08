@@ -1,0 +1,38 @@
+# Custom OpenClaw agent image with additional CLI tools.
+#
+# Thin overlay on the upstream image — edit the package list below
+# to add or remove tools. The GitHub Action rebuilds automatically
+# when this file changes.
+#
+# Build locally:
+#   podman build -t openclaw-agent:dev image/
+#
+# Pin to a specific upstream release:
+#   podman build --build-arg UPSTREAM=ghcr.io/openclaw/openclaw:0.40.2 \
+#     -t openclaw-agent:dev image/
+
+ARG UPSTREAM=ghcr.io/openclaw/openclaw:latest
+FROM ${UPSTREAM}
+
+USER 0
+
+# ── Apt packages ──────────────────────────────
+# Edit this list to add tools available in Debian Bookworm repos.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+    jq \
+    && rm -rf /var/lib/apt/lists/*
+
+# ── Static binaries (not in Debian repos) ─────
+ARG TARGETARCH=amd64
+
+ARG YQ_VERSION=v4.53.3
+RUN curl -fsSL \
+    "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_${TARGETARCH}" \
+    -o /usr/local/bin/yq \
+    && chmod +x /usr/local/bin/yq
+
+# ── Restore non-root user ─────────────────────
+# OpenShift overrides this with a namespace-assigned UID,
+# but this ensures non-root on vanilla Kubernetes too.
+USER 1000
