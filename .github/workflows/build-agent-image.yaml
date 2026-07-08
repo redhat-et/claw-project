@@ -40,26 +40,34 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Resolve upstream tag
+      - name: Resolve upstream version
         id: upstream
         run: |
           TAG="${{ inputs.upstream_tag }}"
           if [ -z "$TAG" ]; then
-            TAG="latest"
+            # Pull latest and read the version from OCI labels
+            docker pull ghcr.io/openclaw/openclaw:latest >/dev/null 2>&1
+            TAG="$(docker inspect ghcr.io/openclaw/openclaw:latest \
+              --format '{{ index .Config.Labels "org.opencontainers.image.version" }}')"
+            if [ -z "$TAG" ]; then
+              echo "::warning::Could not detect upstream version, falling back to date tag"
+              TAG=""
+            fi
           fi
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          echo "Using upstream tag: $TAG"
+          echo "build_tag=${TAG:-latest}" >> "$GITHUB_OUTPUT"
+          echo "Upstream version: ${TAG:-unknown (using latest)}"
 
       - name: Generate image metadata
         id: meta
         run: |
           DATE="$(date -u +%Y%m%d)"
-          UPSTREAM="${{ steps.upstream.outputs.tag }}"
+          VERSION="${{ steps.upstream.outputs.tag }}"
           FULL="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
 
           TAGS="${FULL}:latest"
-          if [ "$UPSTREAM" != "latest" ]; then
-            TAGS="${TAGS},${FULL}:${UPSTREAM},${FULL}:${UPSTREAM}-${DATE}"
+          if [ -n "$VERSION" ]; then
+            TAGS="${TAGS},${FULL}:${VERSION},${FULL}:${VERSION}-${DATE}"
           else
             TAGS="${TAGS},${FULL}:${DATE}"
           fi
@@ -80,6 +88,6 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           build-args: |
-            UPSTREAM=ghcr.io/openclaw/openclaw:${{ steps.upstream.outputs.tag }}
+            UPSTREAM=ghcr.io/openclaw/openclaw:${{ steps.upstream.outputs.build_tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
