@@ -62,6 +62,18 @@ upstream releases.
 See [Custom agent image](custom-agent-image.md) for the full
 guide.
 
+## Agent backup and restore
+
+Back up and restore agent workspaces to S3-compatible object
+storage using `rclone`. Covers AWS IAM setup, Claw proxy
+passthrough configuration, and per-agent backup prefixes.
+
+See [Agent backup and restore](agent-backup-restore.md) for
+the static-key approach, or [S3 file exchange with Workload
+Identity](s3-workload-identity.md) for IRSA-based access
+with no static credentials (recommended for ROSA and EKS
+clusters).
+
 ## Upgrade procedures
 
 *Planned.* Rolling upgrade strategies for the OpenClaw operator

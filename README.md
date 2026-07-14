@@ -86,6 +86,9 @@ index.
 | [GitOps deployment with Argo CD](docs/gitops-setup.md) | Available |
 | [Git-based change tracking](docs/git-change-tracking.md) | Available |
 | [Sealed Secrets for credentials](docs/sealed-secrets.md) | Available |
+| [Custom agent image](docs/custom-agent-image.md) | Available |
+| [Agent backup and restore (static keys)](docs/agent-backup-restore.md) | Available |
+| [S3 file exchange with Workload Identity](docs/s3-workload-identity.md) | Available |
 | [Cost attribution](docs/operations-guide.md#cost-attribution-strategies), [upgrades](docs/operations-guide.md#upgrade-procedures), [monitoring](docs/operations-guide.md#monitoring-and-observability) | Planned |
 
 ### Reference
