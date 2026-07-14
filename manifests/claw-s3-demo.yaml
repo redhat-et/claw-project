@@ -1,0 +1,57 @@
+---
+apiVersion: claw.sandbox.redhat.com/v1alpha1
+kind: Claw
+metadata:
+  name: marketing-specialist-upstream
+spec:
+  serviceAccountName: "claw-s3"
+  image: "quay.io/redhat-et/openclaw-agent:2026.6.11"
+  idle: false
+  credentials:
+    - name: anthropic-vertex
+      type: gcp
+      secretRef:
+        - name: vertex-sa-key
+          key: sa-key.json
+      gcp:
+        project: "itpc-gcp-octo-eng-claude"
+        location: "global"
+      provider: anthropic
+    - name: aws-s3
+      type: none
+      domain: ".amazonaws.com"
+  config:
+    raw:
+      agents:
+        defaults:
+          model:
+            primary: "anthropic/claude-sonnet-4-6"
+        list:
+          - id: default
+            default: true
+            name: "Marketing Assistant"
+            workspace: "~/.openclaw/workspace"
+  workspace:
+    gitSources:
+      - url: https://github.com/redhat-et/claw-collections.git
+        ref: main
+        mode: overwrite
+        items:
+          - path: SOUL.md
+            repoPath: >-
+              enterprise-profiles/marketing-specialist/workspace-main/SOUL.md
+          - path: IDENTITY.md
+            repoPath: >-
+              enterprise-profiles/marketing-specialist/workspace-main/IDENTITY.md
+          - path: AGENTS.md
+            repoPath: >-
+              enterprise-profiles/marketing-specialist/workspace-main/AGENTS.md
+          - path: TOOLS.md
+            repoPath: >-
+              enterprise-profiles/marketing-specialist/workspace-main/TOOLS.md
+          - path: skills/campaign-brief/SKILL.md
+            repoPath: >-
+              enterprise-profiles/marketing-specialist/workspace-main/skills/campaign-brief/SKILL.md
+          - path: skills/content-calendar/SKILL.md
+            repoPath: >-
+              enterprise-profiles/marketing-specialist/workspace-main/skills/content-calendar/SKILL.md
