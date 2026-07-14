@@ -1,4 +1,10 @@
 ---
+# Demo manifest for S3 file exchange with Workload Identity.
+# Before applying, create the "claw-s3" ServiceAccount with IRSA
+# annotation — see docs/s3-workload-identity.md#kubernetes-serviceaccount
+#
+# Replace the credentials section below with your own LLM provider
+# configuration and secrets.
 apiVersion: claw.sandbox.redhat.com/v1alpha1
 kind: Claw
 metadata:
@@ -14,7 +20,7 @@ spec:
         - name: vertex-sa-key
           key: sa-key.json
       gcp:
-        project: "itpc-gcp-octo-eng-claude"
+        project: "<your-gcp-project>"
         location: "global"
       provider: anthropic
     - name: aws-s3

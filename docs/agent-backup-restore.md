@@ -83,7 +83,7 @@ output — the secret is shown only once.
 | Item | Value |
 | ---- | ----- |
 | IAM user | `claw-backup` |
-| Access Key ID | `AKIA6NU5MYLANWKNTZGN` |
+| Access Key ID | `AKIAIOSFODNN7EXAMPLE` |
 | Secret Access Key | *(stored in password manager — not committed to Git)* |
 | Bucket | `s3://panni-claw-backups` |
 | Region | `us-east-1` |
@@ -130,7 +130,7 @@ Run this inside the agent (or ask the agent to run it):
 ```bash
 rclone config create claw-s3 s3 \
   provider AWS \
-  access_key_id AKIA6NU5MYLANWKNTZGN \
+  access_key_id AKIAIOSFODNN7EXAMPLE \
   secret_access_key "<your-secret-key>" \
   region us-east-1
 ```

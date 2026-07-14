@@ -314,6 +314,25 @@ spec:
 > Workload Identity needs both S3 endpoints and
 > `sts.amazonaws.com` for the token exchange. The broad
 > suffix covers both.
+>
+> **Security trade-off:** `.amazonaws.com` allows egress to
+> all AWS service endpoints, not just S3 and STS. The IAM
+> role restricts what the agent can *do* (only S3 on one
+> bucket), but the network path is wider than necessary.
+> For tighter defense-in-depth, use two separate entries:
+>
+> ```yaml
+> - name: aws-sts
+>   type: none
+>   domain: "sts.amazonaws.com"
+> - name: aws-s3
+>   type: none
+>   domain: ".s3.us-east-1.amazonaws.com"
+> ```
+>
+> This limits egress to STS and S3 in a single region.
+> The broader `.amazonaws.com` is acceptable for demos and
+> development clusters where simplicity is preferred.
 
 A complete example manifest is available at
 [`manifests/claw-s3-demo.yaml`](../manifests/claw-s3-demo.yaml).
@@ -329,11 +348,14 @@ oc get pod -n <your-namespace> -l app=claw \
 ```
 
 Confirm the IRSA webhook injected the expected environment
-variables:
+variables (use the gateway pod from the previous command,
+or the label selector):
 
 ```bash
-oc exec -n <your-namespace> deployment/<instance-name> \
-  -- env | grep AWS
+oc exec -n <your-namespace> \
+  $(oc get pod -n <your-namespace> -l app=claw \
+    -o jsonpath='{.items[0].metadata.name}') \
+  -c gateway -- env | grep AWS
 ```
 
 Expected output:
