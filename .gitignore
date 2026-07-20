@@ -16,3 +16,9 @@ tmp/
 
 # Superpowers
 .superpowers/
+
+# PDF
+*.pdf
+
+# scratchpad area for local experiments
+scratchpad/
