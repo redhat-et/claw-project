@@ -22,7 +22,7 @@ Patricia is what we call a power user. She has been running
 [OpenClaw](https://openclaw.ai) on her laptop for months and she
 knows exactly how she likes her agent configured. She doesn't need
 me to pick a persona, install skills, or choose a model. She just
-needs infrastructure: a proxy, credentials, and a route.
+needs infrastructure: a proxy, credentials, and a way to talk to the Claw.
 
 I create the simplest Claw manifest possible:
 
@@ -40,7 +40,8 @@ spec:
           key: api-key
 ```
 
-Ten lines. The operator creates the gateway, the credential-proxy,
+Ten lines. The [operator](https://github.com/codeready-toolchain/claw-operator)
+creates the gateway, the credential-proxy,
 a persistent volume for her workspace, and an OpenShift Route.
 Patricia gets a URL, opens it in her browser, and configures
 everything else through the OpenClaw UI — model preferences,
@@ -53,9 +54,9 @@ The YAML was shorter than the ticket she filed.
 Mark is not Patricia. Mark wants an agent that helps him plan
 campaigns, write copy, and analyze performance metrics. He does not
 want to spend three days explaining to an AI what a "campaign
-brief" is. He wants it to work out of the box.
+brief" is. He wants the solution to work out of the box.
 
-Lucky for Mark, we maintain a collection of
+Lucky for Mark, I maintain a collection of
 [enterprise profiles](https://github.com/redhat-et/claw-collections/tree/main/enterprise-profiles) —
 pre-built workspace configurations for common roles. Each profile
 is a directory with persona files that define who the agent is and
@@ -80,7 +81,7 @@ I did not write these profiles by hand. I drafted them with AI
 help, then asked our marketing team to review and edit. The SOUL.md
 has hard constraints — the agent will never fabricate metrics, never
 make unverified product claims, and never use competitor trademarks
-without flagging it for legal. The marketing team signed off on
+without flagging it for the legal to review. The marketing team signed off on
 these rules. I just make sure they are enforced.
 
 Mark's manifest is longer than Patricia's, but only because it
@@ -120,7 +121,8 @@ her IDENTITY.md and USER.md — same role, same guardrails,
 personalized experience.
 
 When the pod starts, the operator clones the specified files from
-Git and seeds the workspace. Mark opens his browser and finds an
+Git and seeds the workspace (I'm planning to make more robust and
+use OCI images for that in the future). Mark opens his browser and finds an
 assistant that already knows how to build a campaign brief, already
 understands the company's brand guidelines, and already refuses to
 make up numbers. He doesn't need to configure anything.
@@ -158,7 +160,8 @@ manifests/
     research-contractor.yaml
 ```
 
-An ApplicationSet does the rest. It scans `manifests/` for
+An [ApplicationSet](https://argo-cd.readthedocs.io/en/stable/user-guide/application-set/)
+does the rest. It scans `manifests/` for
 subdirectories and creates one Argo CD Application per directory.
 Each directory name maps to a `<name>-claw` namespace:
 
@@ -207,8 +210,8 @@ five minutes.
 
 Self-healing is on: if someone manually deletes a Claw resource
 from the cluster, Argo CD puts it back. Git is the source of truth.
-Not me, not the web console, not whoever has `cluster-admin` and
-gets creative on a Friday afternoon.
+Not me, not the web console, not whoever has `cluster-admin` permissions 
+and gets creative on a Friday afternoon.
 
 For Henry, I pick the `hr-specialist` profile. For Felicia, the
 `financial-analyst`. Some users, I know, would spend a week picking
@@ -284,12 +287,12 @@ spec:
 
 Four layers, all enforced by the platform:
 
-| Layer | What it does |
-|-------|-------------|
-| `readOnly` | SOUL.md, AGENTS.md, skills are mounted read-only. The agent gets `EROFS: read-only file system` if it tries to edit them. |
-| `mode: overwrite` | Configuration is re-seeded from Git on every restart. No drift. |
-| `builtinPassthroughs: []` | All public domains are blocked. The agent can only reach approved internal services. |
-| `pluginInstallation: false` | npm and plugin registries are unreachable. No unauthorized extensions. |
+| Layer                       | What it does                                                                                                              |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `readOnly`                  | SOUL.md, AGENTS.md, skills are mounted read-only. The agent gets `EROFS: read-only file system` if it tries to edit them. |
+| `mode: overwrite`           | Configuration is re-seeded from Git on every restart. No drift.                                                           |
+| `builtinPassthroughs: []`   | All public domains are blocked. The agent can only reach approved internal services.                                      |
+| `pluginInstallation: false` | npm and plugin registries are unreachable. No unauthorized extensions.                                                    |
 
 Why does this matter? Because the agent is the most capable user in
 its container. It has shell access, it knows where its config files
@@ -312,15 +315,15 @@ namespace. Done.
 Looking back at the week, the pattern is clear:
 
 - **Agents are Kubernetes resources.** A Claw manifest is just
-  another YAML file — it lives in Git, it deploys through Argo CD,
-  it heals itself, it scales to zero.
+  another YAML file — it lives in Git, deploys through Argo CD,
+  heals itself, and scales to zero.
 - **Profiles are code.** SOUL.md, AGENTS.md, and skills are
   version-controlled, reviewed by domain experts, and deployed
   immutably. They are the agent's firmware.
 - **Security is declarative.** Read-only mounts, network
-  restrictions, and apply policies are not afterthoughts bolted on
+  restrictions, and other policies are not afterthoughts bolted on
   at runtime. They are fields in the manifest, visible in the diff,
-  reviewed in the PR.
+  and reviewed in a PR.
 
 This is what "Agents as Code" means in practice. Not a framework,
 not a new abstraction — just the same Infrastructure-as-Code
