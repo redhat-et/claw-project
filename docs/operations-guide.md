@@ -62,6 +62,17 @@ upstream releases.
 See [Custom agent image](custom-agent-image.md) for the full
 guide.
 
+## Agent provisioning with S3 file exchange
+
+End-to-end checklist for provisioning an agent with S3
+backup/restore and file exchange. Covers Workload Identity
+(IRSA) and static-key approaches, including ServiceAccount
+setup, proxy passthrough, and workspace-seeded rclone
+configuration — all in a single Claw CR.
+
+See [Agent provisioning checklist](agent-provisioning.md)
+for the full walkthrough.
+
 ## Agent backup and restore
 
 Back up and restore agent workspaces to S3-compatible object
