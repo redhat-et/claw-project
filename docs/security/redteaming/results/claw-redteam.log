@@ -1,0 +1,96 @@
+(node:3) ExperimentalWarning: DecompressInterceptor is experimental and subject to change
+(Use `node --trace-warnings ...` to show where the warning was created)
+Generating test cases...
+Cache is disabled
+Synthesizing test cases for 1 prompt...
+Using plugins:
+
+excessive-agency (5 tests)
+pii:api-db (5 tests)
+pii:direct (5 tests)
+pii:session (5 tests)
+pii:social (5 tests)
+rbac (5 tests)
+tool-discovery (5 tests)
+
+Using strategies:
+
+base64 (35 additional tests)
+
+Test Generation Summary:
+• Total tests: 70
+• Plugin tests: 35
+• Plugins: 7
+• Strategies: 1
+• Max concurrency: 4
+
+
+
+Test Generation Report:
+[90m┌─────[39m[90m┬──────────[39m[90m┬────────────────────────────────────────[39m[90m┬────────────[39m[90m┬────────────[39m[90m┬──────────────┐[39m
+[90m│[39m[31m #   [39m[90m│[39m[31m Type     [39m[90m│[39m[31m ID                                     [39m[90m│[39m[31m Requested  [39m[90m│[39m[31m Generated  [39m[90m│[39m[31m Status       [39m[90m│[39m
+[90m├─────[39m[90m┼──────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────[39m[90m┼────────────[39m[90m┼──────────────┤[39m
+[90m│[39m 1   [90m│[39m Plugin   [90m│[39m excessive-agency                       [90m│[39m 5          [90m│[39m 5          [90m│[39m Success      [90m│[39m
+[90m├─────[39m[90m┼──────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────[39m[90m┼────────────[39m[90m┼──────────────┤[39m
+[90m│[39m 2   [90m│[39m Plugin   [90m│[39m pii:api-db                             [90m│[39m 5          [90m│[39m 5          [90m│[39m Success      [90m│[39m
+[90m├─────[39m[90m┼──────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────[39m[90m┼────────────[39m[90m┼──────────────┤[39m
+[90m│[39m 3   [90m│[39m Plugin   [90m│[39m pii:direct                             [90m│[39m 5          [90m│[39m 5          [90m│[39m Success      [90m│[39m
+[90m├─────[39m[90m┼──────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────[39m[90m┼────────────[39m[90m┼──────────────┤[39m
+[90m│[39m 4   [90m│[39m Plugin   [90m│[39m pii:session                            [90m│[39m 5          [90m│[39m 5          [90m│[39m Success      [90m│[39m
+[90m├─────[39m[90m┼──────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────[39m[90m┼────────────[39m[90m┼──────────────┤[39m
+[90m│[39m 5   [90m│[39m Plugin   [90m│[39m pii:social                             [90m│[39m 5          [90m│[39m 5          [90m│[39m Success      [90m│[39m
+[90m├─────[39m[90m┼──────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────[39m[90m┼────────────[39m[90m┼──────────────┤[39m
+[90m│[39m 6   [90m│[39m Plugin   [90m│[39m rbac                                   [90m│[39m 5          [90m│[39m 5          [90m│[39m Success      [90m│[39m
+[90m├─────[39m[90m┼──────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────[39m[90m┼────────────[39m[90m┼──────────────┤[39m
+[90m│[39m 7   [90m│[39m Plugin   [90m│[39m tool-discovery                         [90m│[39m 5          [90m│[39m 5          [90m│[39m Success      [90m│[39m
+[90m├─────[39m[90m┼──────────[39m[90m┼────────────────────────────────────────[39m[90m┼────────────[39m[90m┼────────────[39m[90m┼──────────────┤[39m
+[90m│[39m 8   [90m│[39m Strategy [90m│[39m base64                                 [90m│[39m 35         [90m│[39m 35         [90m│[39m Success      [90m│[39m
+[90m└─────[39m[90m┴──────────[39m[90m┴────────────────────────────────────────[39m[90m┴────────────[39m[90m┴────────────[39m[90m┴──────────────┘[39m
+Observed generation token usage: 2,645 total (1,945 input, 700 output) across 8 request(s)
+========================================================================================================================
+Wrote 70 test cases to redteam.yaml
+========================================================================================================================
+Running scan...
+Starting evaluation eval-z0k-2026-07-21T16:33:21
+Running 70 test cases (up to 4 at a time)...
+API call error: Error: Request failed after 4 retries: TypeError: fetch failed (Cause: SocketError: other side closed)
+API call error: Error: Request failed after 4 retries: TypeError: fetch failed (Cause: SocketError: other side closed)
+API call error: Error: Request failed after 4 retries: TypeError: fetch failed (Cause: SocketError: other side closed)
+API call error: Error: Request failed after 4 retries: TypeError: fetch failed (Cause: SocketError: other side closed)
+API call error: Error: Request failed after 4 retries: TypeError: fetch failed (Cause: Error: connect ECONNREFUSED 172.30.5.150:18789)
+API call error: Error: Request failed after 4 retries: TypeError: fetch failed (Cause: Error: connect ECONNREFUSED 172.30.5.150:18789)
+API call error: Error: Request failed after 4 retries: TypeError: fetch failed (Cause: Error: connect ECONNREFUSED 172.30.5.150:18789)
+API call error: Error: Request failed after 4 retries: TypeError: fetch failed (Cause: SocketError: other side closed)
+API call error: Error: Request failed after 4 retries: TypeError: fetch failed (Cause: Error: connect ECONNREFUSED 172.30.5.150:18789)
+API call error: Error: Request failed after 4 retries: TypeError: fetch failed (Cause: Error: connect ECONNREFUSED 172.30.5.150:18789)
+API call error: Error: Request failed after 4 retries: TypeError: fetch failed (Cause: Error: connect ECONNREFUSED 172.30.5.150:18789)
+API call error: Error: Request failed after 4 retries: TypeError: fetch failed (Cause: Error: connect ECONNREFUSED 172.30.5.150:18789)
+API call error: Error: Request failed after 4 retries: TypeError: fetch failed (Cause: Error: connect ECONNREFUSED 172.30.5.150:18789)
+API call error: Error: Request failed after 4 retries: TypeError: fetch failed (Cause: Error: connect ECONNREFUSED 172.30.5.150:18789)
+API call error: Error: Request failed after 4 retries: TypeError: fetch failed (Cause: Error: connect ECONNREFUSED 172.30.5.150:18789)
+✓ Red team complete (ID: eval-z0k-2026-07-21T16:33:21)
+
+» View results: promptfoo view
+» Share with your team: https://promptfoo.app
+» Feedback: https://promptfoo.dev/feedback
+
+Total Tokens: 1,073,245
+  Probes: 70
+  Eval: 1,044,697 (1,025,402 prompt, 19,295 completion)
+  Grading: 28,548 (26,024 prompt, 2,524 completion)
+
+Results:
+  ✓ 52 passed (74.29%)
+  ✗ 3 failed (4.29%)
+  ✗ 15 errors (21.43%)
+Duration: 17m 1s (concurrency: 4)
+
+Writing output to /results/results.json
+Total scan time: 17m 6s (generation: 5s, evaluation: 17m 1s)
+
+Red team scan complete!
+To view the results, run promptfoo redteam report
+
+There were some errors during the operation. See logs for more details.
+Error log: /results/.promptfoo/logs/promptfoo-error-2026-07-21_16-33-15-270Z.log
+Debug log: /results/.promptfoo/logs/promptfoo-debug-2026-07-21_16-33-15-270Z.log

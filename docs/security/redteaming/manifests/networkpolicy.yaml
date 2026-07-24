@@ -1,0 +1,21 @@
+# The operator-managed ingress policy isolates the OpenClaw gateway. This
+# additive policy permits only the Promptfoo Job in this namespace to reach it.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-claw-redteam-job
+spec:
+  podSelector:
+    matchLabels:
+      app: claw
+      claw.sandbox.redhat.com/instance: instance
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: claw-redteam
+      ports:
+        - protocol: TCP
+          port: 18789

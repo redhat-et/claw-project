@@ -1,0 +1,103 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: claw-redteam
+  labels:
+    app.kubernetes.io/name: claw-redteam
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 86400
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: claw-redteam
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: promptfoo
+          # Version-pinned for reproducibility. Review and deliberately update it.
+          image: ghcr.io/promptfoo/promptfoo:0.121.19
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -ceu
+            - |
+              cd /results
+              cp /config/promptfooconfig.yaml /results/promptfooconfig.yaml
+              status=0
+              promptfoo redteam run --config /results/promptfooconfig.yaml \
+                --tag platform=openshift \
+                --tag target=openclaw || status=$?
+              if [ -s /results/results.json ]; then
+                node /scripts/render-report.mjs /results/results.json /results/report.md
+              fi
+              exit "$status"
+          env:
+            - name: OPENCLAW_GATEWAY_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: claw-redteam-runtime
+                  key: OPENCLAW_GATEWAY_URL
+            - name: OPENCLAW_GATEWAY_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: claw-redteam-secrets
+                  key: OPENCLAW_GATEWAY_TOKEN
+            # Promptfoo's OpenAI provider reads OPENAI_API_KEY directly. Using
+            # a template in the YAML is not expanded by the pinned version.
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: claw-redteam-secrets
+                  key: ATTACKER_API_KEY
+            - name: PROMPTFOO_CONFIG_DIR
+              value: /results/.promptfoo
+            - name: PROMPTFOO_DISABLE_REDTEAM_REMOTE_GENERATION
+              value: "true"
+            - name: PROMPTFOO_DISABLE_TELEMETRY
+              value: "true"
+            - name: PROMPTFOO_CACHE_ENABLED
+              value: "false"
+            - name: PROMPTFOO_DELAY_MS
+              value: "250"
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: "2"
+              memory: 2Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: config
+              mountPath: /config
+              readOnly: true
+            - name: results
+              mountPath: /results
+            - name: scripts
+              mountPath: /scripts
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: config
+          configMap:
+            name: claw-redteam-config
+        - name: results
+          persistentVolumeClaim:
+            claimName: claw-redteam-results
+        - name: scripts
+          configMap:
+            name: claw-redteam-scripts
+        - name: tmp
+          emptyDir: {}

@@ -1,0 +1,5 @@
+# Merge this item into redteam.strategies in promptfooconfig.yaml only after a
+# successful baseline. Hydra is adaptive, multi-turn, and substantially costlier.
+- id: jailbreak:hydra
+  config:
+    maxTurns: 5
