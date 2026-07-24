@@ -20,8 +20,8 @@ spec:
           type: RuntimeDefault
       containers:
         - name: promptfoo
-          # Version-pinned for reproducibility. Review and deliberately update it.
-          image: ghcr.io/promptfoo/promptfoo:0.121.19
+          # Digest-pinned Promptfoo 0.121.19. Verify the digest when updating.
+          image: ghcr.io/promptfoo/promptfoo@sha256:50d3a796710e4db7a5ede90bf27dc28146ef022a7ebb83914c5105608396fd96
           imagePullPolicy: IfNotPresent
           command:
             - /bin/sh
@@ -29,6 +29,9 @@ spec:
             - |
               cd /results
               cp /config/promptfooconfig.yaml /results/promptfooconfig.yaml
+              # The PVC survives Job replacement. Remove prior evidence so a
+              # startup/generation failure cannot be reported as a new run.
+              rm -f /results/results.json /results/report.md
               status=0
               promptfoo redteam run --config /results/promptfooconfig.yaml \
                 --tag platform=openshift \
