@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: redteam
+
+resources:
+  - manifests/pvc.yaml
+  - manifests/runtime-config.yaml
+  - manifests/networkpolicy.yaml
+  - manifests/job.yaml
+
+configMapGenerator:
+  - name: claw-redteam-config
+    files:
+      - promptfooconfig.yaml=config/promptfooconfig.yaml
+  - name: claw-redteam-scripts
+    files:
+      - render-report.mjs=scripts/render-report.mjs
+
+generatorOptions:
+  disableNameSuffixHash: true

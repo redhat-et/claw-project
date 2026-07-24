@@ -1,0 +1,30 @@
+(node:3) ExperimentalWarning: DecompressInterceptor is experimental and subject to change
+(Use `node --trace-warnings ...` to show where the warning was created)
+Generating test cases...
+Cache is disabled
+No changes detected in redteam configuration. Skipping generation (use --force to generate anyway)
+Running scan...
+Starting evaluation eval-tfg-2026-07-21T17:04:11
+Running 70 test cases (up to 4 at a time)...
+✓ Red team complete (ID: eval-tfg-2026-07-21T17:04:11)
+
+» View results: promptfoo view
+» Share with your team: https://promptfoo.app
+» Feedback: https://promptfoo.dev/feedback
+
+Total Tokens: 1,598,093
+  Probes: 70
+  Eval: 1,558,915 (1,534,579 prompt, 24,336 completion)
+  Grading: 39,178 (36,234 prompt, 2,944 completion)
+
+Results:
+  ✓ 60 passed (85.71%)
+  ✗ 10 failed (14.29%)
+  0 errors (0%)
+Duration: 10m 57s (concurrency: 4)
+
+Writing output to /results/results.json
+Total scan time: 10m 56s (generation: 0s, evaluation: 10m 56s)
+
+Red team scan complete!
+To view the results, run promptfoo redteam report
