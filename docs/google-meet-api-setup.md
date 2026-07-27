@@ -186,8 +186,9 @@ Choose a private directory on the persistent OpenClaw volume:
 EVENT_QUERY="Weekly team meeting"
 OUTPUT_DIR="/home/node/.openclaw/google-meet-artifacts/weekly-team-meeting"
 
-mkdir -p "$(dirname "${OUTPUT_DIR}")"
-chmod 700 "$(dirname "${OUTPUT_DIR}")"
+umask 077
+mkdir -p "${OUTPUT_DIR}"
+chmod 700 "${OUTPUT_DIR}"
 
 openclaw googlemeet export \
   --event "${EVENT_QUERY}" \
