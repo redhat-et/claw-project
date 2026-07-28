@@ -54,7 +54,7 @@ you can fix and contribute:
 | --------------------------- | ---------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
 | **openclaw**                | [github.com/openclaw/openclaw](https://github.com/openclaw/openclaw)                                 | The OpenClaw agent — config, skills, plugins, the Control UI      |
 | **claw-operator**           | [github.com/redhat-et/claw-operator](https://github.com/redhat-et/claw-operator)                     | The OpenShift operator — defines the `Claw` CR, manages instances |
-| **claw-operator-dashboard** | [github.com/redhat-et/claw-operator-dashboard](https://github.com/redhat-et/claw-operator-dashboard) | The Deployer web app and admin dashboard                          |
+| **claw-operator-extras**    | [github.com/redhat-et/claw-operator-extras](https://github.com/redhat-et/claw-operator-extras)       | The Deployer web app and admin dashboard                          |
 | **claw-collections**        | [github.com/redhat-et/claw-collections](https://github.com/redhat-et/claw-collections)               | Reusable workspace bundles (collections) and examples             |
 | **claw-project**            | [github.com/redhat-et/claw-project](https://github.com/redhat-et/claw-project)                       | This hub — issues and documentation                               |
 
