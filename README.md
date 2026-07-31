@@ -90,6 +90,7 @@ index.
 | [Agent backup and restore (static keys)](docs/agent-backup-restore.md) | Available |
 | [S3 file exchange with Workload Identity](docs/s3-workload-identity.md) | Available |
 | [Google Meet and Calendar API setup](docs/google-meet-api-setup.md) | Available |
+| [Buzz team relay for OpenClaw](docs/buzz/README.md) | Available |
 | [Cost attribution](docs/operations-guide.md#cost-attribution-strategies), [upgrades](docs/operations-guide.md#upgrade-procedures), [monitoring](docs/operations-guide.md#monitoring-and-observability) | Planned |
 
 ### Reference
